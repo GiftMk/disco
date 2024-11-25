@@ -1,0 +1,15 @@
+type UploadDetails {
+  audioUploadUrl: String!
+  audioFilename: String!
+  imageUploadUrl: String!
+  imageFilename: String!
+}
+
+input UploadDetailsInput {
+  audioExtension: String!
+  imageExtension: String!
+}
+
+type Query {
+  uploadDetails(input: UploadDetailsInput!): UploadDetails!
+}
