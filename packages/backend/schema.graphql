@@ -13,3 +13,22 @@ input UploadDetailsInput {
 type Query {
   uploadDetails(input: UploadDetailsInput!): UploadDetails!
 }
+
+input NormaliseAudioSettings {
+  integrated: Float!
+  truePeak: Float!
+  loudnessRange: Float!
+}
+
+input NormaliseAudioInput {
+  audioFilename: String!
+  settings: NormaliseAudioSettings
+}
+
+type NormaliseAudioResponse {
+  outputFilename: String!
+}
+
+type Mutation {
+  normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse
+}

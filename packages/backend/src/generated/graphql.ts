@@ -16,6 +16,32 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type Mutation = {
+  __typename?: 'Mutation';
+  normaliseAudio?: Maybe<NormaliseAudioResponse>;
+};
+
+
+export type MutationNormaliseAudioArgs = {
+  input: NormaliseAudioInput;
+};
+
+export type NormaliseAudioInput = {
+  audioFilename: Scalars['String']['input'];
+  settings?: InputMaybe<NormaliseAudioSettings>;
+};
+
+export type NormaliseAudioResponse = {
+  __typename?: 'NormaliseAudioResponse';
+  outputFilename: Scalars['String']['output'];
+};
+
+export type NormaliseAudioSettings = {
+  integrated: Scalars['Float']['input'];
+  loudnessRange: Scalars['Float']['input'];
+  truePeak: Scalars['Float']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   uploadDetails: UploadDetails;
@@ -112,6 +138,11 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  Mutation: ResolverTypeWrapper<{}>;
+  NormaliseAudioInput: NormaliseAudioInput;
+  NormaliseAudioResponse: ResolverTypeWrapper<NormaliseAudioResponse>;
+  NormaliseAudioSettings: NormaliseAudioSettings;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UploadDetails: ResolverTypeWrapper<UploadDetails>;
@@ -121,10 +152,24 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
+  Float: Scalars['Float']['output'];
+  Mutation: {};
+  NormaliseAudioInput: NormaliseAudioInput;
+  NormaliseAudioResponse: NormaliseAudioResponse;
+  NormaliseAudioSettings: NormaliseAudioSettings;
   Query: {};
   String: Scalars['String']['output'];
   UploadDetails: UploadDetails;
   UploadDetailsInput: UploadDetailsInput;
+}>;
+
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  normaliseAudio?: Resolver<Maybe<ResolversTypes['NormaliseAudioResponse']>, ParentType, ContextType, RequireFields<MutationNormaliseAudioArgs, 'input'>>;
+}>;
+
+export type NormaliseAudioResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['NormaliseAudioResponse'] = ResolversParentTypes['NormaliseAudioResponse']> = ResolversObject<{
+  outputFilename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -140,6 +185,8 @@ export type UploadDetailsResolvers<ContextType = any, ParentType extends Resolve
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  Mutation?: MutationResolvers<ContextType>;
+  NormaliseAudioResponse?: NormaliseAudioResponseResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   UploadDetails?: UploadDetailsResolvers<ContextType>;
 }>;

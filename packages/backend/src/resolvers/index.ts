@@ -1,9 +1,13 @@
 import type { Resolvers } from "../generated/graphql";
 import type { ServerContext } from "../serverContext";
-import { uploadDetails } from "./uploadDetails";
+import { normaliseAudioResolver } from "./normaliseAudioResolver";
+import { uploadDetailsResolver } from "./uploadDetailsResolver";
 
 export const resolvers: Resolvers<ServerContext> = {
   Query: {
-    uploadDetails,
+    uploadDetails: uploadDetailsResolver,
+  },
+  Mutation: {
+    normaliseAudio: normaliseAudioResolver,
   },
 };

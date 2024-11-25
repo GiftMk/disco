@@ -5,13 +5,9 @@ import type {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand, type S3Client } from "@aws-sdk/client-s3";
 import type { ServerContext } from "../serverContext";
-import { randomUUID } from "node:crypto";
+import { generateFilename } from "./utils";
 
 const URL_TIMEOUT_S = 60 * 15;
-
-const getFilename = (extension: string): string => {
-  return `${randomUUID()}.${extension}`;
-};
 
 const getUploadUrl = async (
   s3Client: S3Client,
@@ -27,21 +23,21 @@ const getUploadUrl = async (
   });
 };
 
-export const uploadDetails = async (
+export const uploadDetailsResolver = async (
   _: unknown,
   args: QueryUploadDetailsArgs,
   contextValue: ServerContext
 ): Promise<UploadDetails> => {
   const { audioExtension, imageExtension } = args.input;
 
-  const audioFilename = getFilename(audioExtension);
+  const audioFilename = generateFilename(audioExtension);
   const audioUploadUrl = await getUploadUrl(
     contextValue.s3.client,
     contextValue.s3.uploadBucket,
     audioFilename
   );
 
-  const imageFilename = getFilename(imageExtension);
+  const imageFilename = generateFilename(imageExtension);
   const imageUploadUrl = await getUploadUrl(
     contextValue.s3.client,
     contextValue.s3.uploadBucket,
