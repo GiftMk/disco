@@ -9,6 +9,10 @@ import { randomUUID } from "node:crypto";
 
 const URL_TIMEOUT_S = 60 * 15;
 
+const getFilename = (extension: string): string => {
+  return `${randomUUID()}.${extension}`;
+};
+
 const getUploadUrl = async (
   s3Client: S3Client,
   bucket: string,
@@ -30,13 +34,14 @@ export const uploadDetails = async (
 ): Promise<UploadDetails> => {
   const { audioExtension, imageExtension } = args.input;
 
-  const audioFilename = `${randomUUID()}.${audioExtension}`;
+  const audioFilename = getFilename(audioExtension);
   const audioUploadUrl = await getUploadUrl(
     contextValue.s3.client,
     contextValue.s3.uploadBucket,
     audioFilename
   );
-  const imageFilename = `${randomUUID()}.${imageExtension}`;
+
+  const imageFilename = getFilename(imageExtension);
   const imageUploadUrl = await getUploadUrl(
     contextValue.s3.client,
     contextValue.s3.uploadBucket,
