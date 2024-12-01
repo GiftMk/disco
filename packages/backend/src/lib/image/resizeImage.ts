@@ -13,11 +13,17 @@ import {
 } from "../result";
 import { logger } from "../logger";
 
-export const resizeImage = async (
-  inputPath: string,
-  aspectRatio: AspectRatio,
-  outputPath: string
-): Promise<Result> => {
+type ResizeImageRequest = {
+  inputPath: string;
+  aspectRatio: AspectRatio;
+  outputPath: string;
+};
+
+export const resizeImage = async ({
+  inputPath,
+  aspectRatio,
+  outputPath,
+}: ResizeImageRequest): Promise<Result> => {
   const dimensionsResult = await getDimensions(inputPath);
   if (isFailure(dimensionsResult)) return dimensionsResult;
 

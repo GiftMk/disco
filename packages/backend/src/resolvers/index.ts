@@ -1,5 +1,6 @@
 import type { Resolvers } from "../generated/graphql";
 import type { ServerContext } from "../serverContext";
+import { createVideoResolver } from "./createVideoResolver";
 import { normaliseAudioResolver } from "./normaliseAudioResolver";
 import { uploadDetailsResolver } from "./uploadDetailsResolver";
 
@@ -10,5 +11,6 @@ export const resolvers: Resolvers<ServerContext> = {
   },
   Mutation: {
     normaliseAudio: normaliseAudioResolver,
+    createVideo: createVideoResolver,
   },
 };

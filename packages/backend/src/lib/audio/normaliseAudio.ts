@@ -17,11 +17,17 @@ const defaultSettings: Readonly<NormalisationSettings> = {
   loudnessRange: 11,
 };
 
-export const normaliseAudio = async (
-  inputPath: string,
-  outputPath: string,
-  settings: NormalisationSettings = defaultSettings
-): Promise<Result> => {
+type NormaliseAudioRequest = {
+  inputPath: string;
+  outputPath: string;
+  settings?: NormalisationSettings;
+};
+
+export const normaliseAudio = async ({
+  inputPath,
+  outputPath,
+  settings = defaultSettings,
+}: NormaliseAudioRequest): Promise<Result> => {
   const metadataResult = await getMetadata(inputPath, settings);
   if (isFailure(metadataResult)) {
     return metadataResult;

@@ -5,27 +5,27 @@ import type {
 } from "../generated/graphql";
 import { normaliseAudio } from "../lib/audio/normaliseAudio";
 import { isSuccess } from "../lib/result";
-import { generateFilename } from "./utils";
+import { filePath, generateFilename } from "../lib/filePath";
 
 export const normaliseAudioResolver = async (
   _: unknown,
   args: MutationNormaliseAudioArgs
 ): Promise<NormaliseAudioResponse> => {
   const { audioFilename, settings } = args.input;
-  const inputFilenmae = `.inputs/${audioFilename}`;
-  const outputFilename = `.outputs/${generateFilename("mp3")}`;
+  const inputPath = filePath(".input", audioFilename);
+  const outputPath = filePath(".output", generateFilename("mp3"));
 
-  const result = await normaliseAudio(
-    inputFilenmae,
-    outputFilename,
-    settings ?? undefined
-  );
+  const result = await normaliseAudio({
+    inputPath,
+    outputPath,
+    settings: settings ?? undefined,
+  });
 
   if (isSuccess(result)) {
-    return { outputFilename };
+    return { outputFilename: outputPath };
   }
 
   throw new GraphQLError(
-    `Failed to normalise audio, the follow error(s) occurred ${result.error}`
+    `Failed to normalise audio, the follow error(s) occurred: ${result.error}`
   );
 };

@@ -16,9 +16,25 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type CreateVideoInput = {
+  audioFilename: Scalars['String']['input'];
+  imageFilename: Scalars['String']['input'];
+};
+
+export type CreateVideoResponse = {
+  __typename?: 'CreateVideoResponse';
+  outputFilename: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  createVideo?: Maybe<CreateVideoResponse>;
   normaliseAudio?: Maybe<NormaliseAudioResponse>;
+};
+
+
+export type MutationCreateVideoArgs = {
+  input: CreateVideoInput;
 };
 
 
@@ -139,6 +155,8 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CreateVideoInput: CreateVideoInput;
+  CreateVideoResponse: ResolverTypeWrapper<CreateVideoResponse>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
   NormaliseAudioInput: NormaliseAudioInput;
@@ -153,6 +171,8 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
+  CreateVideoInput: CreateVideoInput;
+  CreateVideoResponse: CreateVideoResponse;
   Float: Scalars['Float']['output'];
   Mutation: {};
   NormaliseAudioInput: NormaliseAudioInput;
@@ -164,7 +184,13 @@ export type ResolversParentTypes = ResolversObject<{
   UploadDetailsInput: UploadDetailsInput;
 }>;
 
+export type CreateVideoResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateVideoResponse'] = ResolversParentTypes['CreateVideoResponse']> = ResolversObject<{
+  outputFilename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  createVideo?: Resolver<Maybe<ResolversTypes['CreateVideoResponse']>, ParentType, ContextType, RequireFields<MutationCreateVideoArgs, 'input'>>;
   normaliseAudio?: Resolver<Maybe<ResolversTypes['NormaliseAudioResponse']>, ParentType, ContextType, RequireFields<MutationNormaliseAudioArgs, 'input'>>;
 }>;
 
@@ -187,6 +213,7 @@ export type UploadDetailsResolvers<ContextType = any, ParentType extends Resolve
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  CreateVideoResponse?: CreateVideoResponseResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NormaliseAudioResponse?: NormaliseAudioResponseResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

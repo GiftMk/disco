@@ -3,6 +3,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import { readFileSync } from "node:fs";
 import { getServerContext, type ServerContext } from "./serverContext";
 import { resolvers } from "./resolvers";
+import { logger } from "./lib/logger";
 
 const typeDefs = readFileSync("./schema.graphql", "utf8");
 
@@ -17,7 +18,7 @@ const startServer = async (port: number) => {
     context: getServerContext,
   });
 
-  console.log(`🚀  Server ready at: ${url}`);
+  logger.log(`🚀  Server ready at: ${url}`);
 };
 
 startServer(4000);

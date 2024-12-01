@@ -30,6 +30,16 @@ type NormaliseAudioResponse {
   outputFilename: String!
 }
 
+input CreateVideoInput {
+  audioFilename: String!
+  imageFilename: String!
+}
+
+type CreateVideoResponse {
+  outputFilename: String!
+}
+
 type Mutation {
   normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse
+  createVideo(input: CreateVideoInput!): CreateVideoResponse
 }
