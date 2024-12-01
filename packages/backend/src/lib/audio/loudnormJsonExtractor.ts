@@ -11,10 +11,8 @@ export class LoudnormJsonExtractor {
       if (line.includes("}")) {
         this.canRead = false;
       }
-    } else {
-      if (line.includes("loudnorm")) {
-        this.canRead = true;
-      }
+    } else if (line.includes("loudnorm")) {
+      this.canRead = true;
     }
   }
 

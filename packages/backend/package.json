@@ -4,8 +4,11 @@
   "type": "module",
   "private": "true",
   "scripts": {
-    "start": "tsx src/index.ts",
-    "codegen": "graphql-codegen"
+    "start": "node dist/index.cjs",
+    "codegen": "graphql-codegen",
+    "dev": "pnpm build && pnpm start",
+    "prebuild": "rm -rf dist",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.cjs"
   },
   "dependencies": {
     "@apollo/server": "^4.11.2",

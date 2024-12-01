@@ -11,6 +11,7 @@ input UploadDetailsInput {
 }
 
 type Query {
+  healthcheck: String!
   uploadDetails(input: UploadDetailsInput!): UploadDetails!
 }
 

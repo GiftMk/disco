@@ -45,7 +45,7 @@ export const normaliseAudio = async (
           ],
         },
       ])
-      .audioQuality(320)
+      .audioBitrate(320)
       .on("start", (command) =>
         logger
           .namespace("normaliseAudio")

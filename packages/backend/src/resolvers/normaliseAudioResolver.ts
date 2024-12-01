@@ -12,10 +12,11 @@ export const normaliseAudioResolver = async (
   args: MutationNormaliseAudioArgs
 ): Promise<NormaliseAudioResponse> => {
   const { audioFilename, settings } = args.input;
-  const outputFilename = generateFilename("mp3");
+  const inputFilenmae = `.inputs/${audioFilename}`;
+  const outputFilename = `.outputs/${generateFilename("mp3")}`;
 
   const result = await normaliseAudio(
-    audioFilename,
+    inputFilenmae,
     outputFilename,
     settings ?? undefined
   );

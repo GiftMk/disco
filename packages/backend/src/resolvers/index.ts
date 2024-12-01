@@ -6,6 +6,7 @@ import { uploadDetailsResolver } from "./uploadDetailsResolver";
 export const resolvers: Resolvers<ServerContext> = {
   Query: {
     uploadDetails: uploadDetailsResolver,
+    healthcheck: () => "Healthy and wealthy",
   },
   Mutation: {
     normaliseAudio: normaliseAudioResolver,
