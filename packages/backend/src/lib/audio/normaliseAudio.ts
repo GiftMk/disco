@@ -34,31 +34,40 @@ export const normaliseAudio = async ({
   }
   const metadata = getValueOrThrow(metadataResult);
 
-  return await new Promise<Result>((resolve, reject) =>
-    ffmpeg(inputPath)
-      .audioFilters([
-        {
-          filter: "loudnorm",
-          options: [
-            ...getInputOptions(settings),
-            "print_format=json",
-            `measured_I=${metadata.inputIntegrated}`,
-            `measured_LRA=${metadata.inputLoudnessRange}`,
-            `measured_TP=${metadata.inputTruePeak}`,
-            `measured_thresh=${metadata.inputThreshold}`,
-            `offset=${metadata.targetOffset}`,
-            "linear=true",
-          ],
-        },
-      ])
-      .audioBitrate(320)
-      .on("start", (command) =>
-        logger
-          .namespace("normaliseAudio")
-          .info(`Started normalising audio with command ${command}`)
-      )
-      .on("end", () => resolve(emptySuccess()))
-      .on("error", (e) => reject(failure(e.message)))
-      .saveToFile(outputPath)
-  );
+  try {
+    return await new Promise<Result>((resolve, reject) =>
+      ffmpeg(inputPath)
+        .audioFilters([
+          {
+            filter: "loudnorm",
+            options: [
+              ...getInputOptions(settings),
+              "print_format=json",
+              `measured_I=${metadata.inputIntegrated}`,
+              `measured_LRA=${metadata.inputLoudnessRange}`,
+              `measured_TP=${metadata.inputTruePeak}`,
+              `measured_thresh=${metadata.inputThreshold}`,
+              `offset=${metadata.targetOffset}`,
+              "linear=true",
+            ],
+          },
+        ])
+        .audioBitrate(320)
+        .on("start", (command) =>
+          logger
+            .namespace("normaliseAudio")
+            .info(`Started normalising audio with command ${command}`)
+        )
+        .on("end", () => resolve(emptySuccess()))
+        .on("error", (e) => reject(failure(e.message)))
+        .saveToFile(outputPath)
+    );
+  } catch (e) {
+    if (e instanceof Error) {
+      return failure(e.message);
+    }
+    return failure(
+      `An unknown error occurred when normalising audio ${inputPath}`
+    );
+  }
 };
