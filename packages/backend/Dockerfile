@@ -12,6 +12,7 @@ COPY tsconfig.json ./
 
 RUN npm install
 RUN npm run build
+RUN rm -rf node_modules
 
 # ARG AWS_REGION
 # ARG UPLOAD_BUCKET
@@ -21,7 +22,7 @@ ENV AWS_REGION="ap-southeast-2"
 ENV UPLOAD_BUCKET="foo"
 ENV DOWNLOAD_BUCKET="bar"
 
-EXPOSE 4000
+EXPOSE 8080
 
 ENTRYPOINT ["npm", "run", "start"]
 

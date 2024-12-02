@@ -5,7 +5,7 @@
   "private": "true",
   "scripts": {
     "start": "node dist/index.cjs",
-    "codegen": "graphql-codegen",
+    "generate": "graphql-codegen",
     "dev": "pnpm build && pnpm start",
     "prebuild": "rm -rf dist",
     "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.cjs"

@@ -18,7 +18,7 @@ const startServer = async (port: number) => {
     context: getServerContext,
   });
 
-  logger.log(`🚀  Server ready at: ${url}`);
+  logger.info(`🚀  Server ready at: ${url}`);
 };
 
-startServer(4000);
+startServer(8080);

@@ -12,8 +12,8 @@ export const normaliseAudioResolver = async (
   args: MutationNormaliseAudioArgs
 ): Promise<NormaliseAudioResponse> => {
   const { audioFilename, settings } = args.input;
-  const inputPath = filePath(".input", audioFilename);
-  const outputPath = filePath(".output", generateFilename("mp3"));
+  const inputPath = filePath(".inputs", audioFilename);
+  const outputPath = filePath(".outputs", generateFilename("mp3"));
 
   const result = await normaliseAudio({
     inputPath,

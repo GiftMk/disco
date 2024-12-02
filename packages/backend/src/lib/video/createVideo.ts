@@ -1,5 +1,4 @@
 import ffmpeg from "fluent-ffmpeg";
-import fs from "node:fs";
 import { emptySuccess, failure, type Result } from "../result";
 import { logger } from "../logger";
 
@@ -14,12 +13,11 @@ export const createVideo = async ({
   imagePath,
   outputPath,
 }: VideoRequest): Promise<Result> => {
-  const outStream = fs.createWriteStream(outputPath);
-
   try {
     await new Promise<void>((resolve, reject) => {
       ffmpeg()
         .input(imagePath)
+        .inputFPS(1)
         .loop()
         .input(audioPath)
         .audioCodec("aac")
@@ -27,23 +25,21 @@ export const createVideo = async ({
         .videoCodec("libx264")
         .outputOption("-pix_fmt", "yuv420p")
         .outputOption("-shortest")
-        .outputFormat("mp4")
-        .outputOption("-movflags frag_keyframe+empty_moov")
         .on("start", (c) =>
           logger.info(`Started making video using command: ${c}`)
         )
         .on("end", () => {
-          logger.info("Finished making video");
+          logger.info(`Finished making video ${outputPath}`);
           resolve();
         })
-        .on("progress", ({ timemark, percent }) =>
-          logger.info(`Current timestamp: ${timemark}, percentage: ${percent}`)
+        .on("progress", ({ timemark }) =>
+          logger.info(`Current timestamp: ${timemark}`)
         )
         .on("error", ({ message }) => {
           logger.error(message);
           reject();
         })
-        .pipe(outStream, { end: true });
+        .saveToFile(outputPath);
     });
 
     return emptySuccess();
