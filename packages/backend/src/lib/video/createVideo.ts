@@ -6,12 +6,14 @@ type VideoRequest = {
 	audioPath: string
 	imagePath: string
 	outputPath: string
+	onProgress?: (timestamp: string) => void
 }
 
 export const createVideo = async ({
 	audioPath,
 	imagePath,
 	outputPath,
+	onProgress,
 }: VideoRequest): Promise<Result> => {
 	try {
 		await new Promise<void>((resolve, reject) => {
@@ -32,9 +34,12 @@ export const createVideo = async ({
 					logger.info(`Finished making video ${outputPath}`)
 					resolve()
 				})
-				.on('progress', ({ timemark }) =>
-					logger.info(`Current timestamp: ${timemark}`),
-				)
+				.on('progress', ({ timemark }) => {
+					logger.info(`Current timestamp: ${timemark}`)
+					if (typeof timemark === 'string') {
+						onProgress?.(timemark)
+					}
+				})
 				.on('error', ({ message }) => {
 					logger.error(message)
 					reject()

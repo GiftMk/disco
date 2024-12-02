@@ -43,3 +43,11 @@ type Mutation {
 	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse
 	createVideo(input: CreateVideoInput!): CreateVideoResponse
 }
+
+type CreatingVideoResponse {
+	timestamp: String!
+}
+
+type Subscription {
+	creatingVideo: CreatingVideoResponse
+}

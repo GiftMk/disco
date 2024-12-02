@@ -4,10 +4,11 @@ import type {
 	MutationCreateVideoArgs,
 } from '../generated/graphql'
 import { generateFilename, filePath } from '../lib/filePath'
-import { isFailure, isSuccess } from '../lib/result'
+import { isFailure } from '../lib/result'
 import { createVideo } from '../lib/video/createVideo'
 import { resizeImage } from '../lib/image/resizeImage'
 import { SixteenByNine } from '../lib/image/dimensions/AspectRatio'
+import { pubsub } from '../pubsub'
 
 export const createVideoResolver = async (
 	_: unknown,
@@ -31,17 +32,13 @@ export const createVideoResolver = async (
 		)
 	}
 
-	const createVideoResult = await createVideo({
+	createVideo({
 		audioPath,
 		imagePath: rezisedImagePath,
 		outputPath,
+		onProgress: timestamp =>
+			pubsub.publish('CREATING_VIDEO', { creatingVideo: { timestamp } }),
 	})
 
-	if (isSuccess(createVideoResult)) {
-		return { outputFilename: outputPath }
-	}
-
-	throw new GraphQLError(
-		`Failed to create video, the follow error(s) occurred: ${createVideoResult.error}`,
-	)
+	return { outputFilename: outputPath }
 }
