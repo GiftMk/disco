@@ -8,7 +8,8 @@
 		"generate": "graphql-codegen",
 		"dev": "pnpm build && pnpm start",
 		"prebuild": "rm -rf dist",
-		"build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.cjs"
+		"build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.cjs",
+		"clean": "rm -r .outputs/*"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.699.0",
