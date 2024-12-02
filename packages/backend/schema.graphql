@@ -1,45 +1,45 @@
 type UploadDetails {
-  audioUploadUrl: String!
-  audioFilename: String!
-  imageUploadUrl: String!
-  imageFilename: String!
+	audioUploadUrl: String!
+	audioFilename: String!
+	imageUploadUrl: String!
+	imageFilename: String!
 }
 
 input UploadDetailsInput {
-  audioExtension: String!
-  imageExtension: String!
+	audioExtension: String!
+	imageExtension: String!
 }
 
 type Query {
-  healthcheck: String!
-  uploadDetails(input: UploadDetailsInput!): UploadDetails!
+	healthcheck: String!
+	uploadDetails(input: UploadDetailsInput!): UploadDetails!
 }
 
 input NormaliseAudioSettings {
-  integrated: Float!
-  truePeak: Float!
-  loudnessRange: Float!
+	integrated: Float!
+	truePeak: Float!
+	loudnessRange: Float!
 }
 
 input NormaliseAudioInput {
-  audioFilename: String!
-  settings: NormaliseAudioSettings
+	audioFilename: String!
+	settings: NormaliseAudioSettings
 }
 
 type NormaliseAudioResponse {
-  outputFilename: String!
+	outputFilename: String!
 }
 
 input CreateVideoInput {
-  audioFilename: String!
-  imageFilename: String!
+	audioFilename: String!
+	imageFilename: String!
 }
 
 type CreateVideoResponse {
-  outputFilename: String!
+	outputFilename: String!
 }
 
 type Mutation {
-  normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse
-  createVideo(input: CreateVideoInput!): CreateVideoResponse
+	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse
+	createVideo(input: CreateVideoInput!): CreateVideoResponse
 }

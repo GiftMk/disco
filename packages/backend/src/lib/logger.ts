@@ -1,3 +1,3 @@
-import adze from "adze";
+import adze from 'adze'
 
-export const logger = adze;
+export const logger = adze

@@ -1,12 +1,12 @@
-import { randomUUID } from "node:crypto";
+import { randomUUID } from 'node:crypto'
 
 export const filePath = (
-  parentDirectory: ".inputs" | ".outputs",
-  filename: string
+	parentDirectory: '.inputs' | '.outputs',
+	filename: string,
 ): string => {
-  return `${parentDirectory}/${filename}`;
-};
+	return `${parentDirectory}/${filename}`
+}
 
 export const generateFilename = (extension: string): string => {
-  return `${randomUUID()}.${extension}`;
-};
+	return `${randomUUID()}.${extension}`
+}
