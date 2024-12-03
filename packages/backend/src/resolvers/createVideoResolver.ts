@@ -36,8 +36,10 @@ export const createVideoResolver = async (
 		audioPath,
 		imagePath: rezisedImagePath,
 		outputPath,
-		onProgress: timestamp =>
-			pubsub.publish('CREATING_VIDEO', { creatingVideo: { timestamp } }),
+		onProgress: percentageComplete =>
+			pubsub.publish('CREATING_VIDEO', {
+				creatingVideo: { percentageComplete },
+			}),
 	})
 
 	return { outputFilename: outputPath }

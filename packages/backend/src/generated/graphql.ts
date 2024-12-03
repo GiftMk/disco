@@ -28,7 +28,7 @@ export type CreateVideoResponse = {
 
 export type CreatingVideoResponse = {
   __typename?: 'CreatingVideoResponse';
-  timestamp: Scalars['String']['output'];
+  percentageComplete?: Maybe<Scalars['Float']['output']>;
 };
 
 export type Mutation = {
@@ -204,7 +204,7 @@ export type CreateVideoResponseResolvers<ContextType = any, ParentType extends R
 }>;
 
 export type CreatingVideoResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatingVideoResponse'] = ResolversParentTypes['CreatingVideoResponse']> = ResolversObject<{
-  timestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  percentageComplete?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

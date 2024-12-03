@@ -1,12 +1,14 @@
 import ffmpeg from 'fluent-ffmpeg'
 import { emptySuccess, failure, type Result } from '../result'
 import { logger } from '../logger'
+import { getAudioDurationInSeconds } from './getAudioDuration'
+import { getPercentageComplete } from './getPercentageComplete'
 
 type VideoRequest = {
 	audioPath: string
 	imagePath: string
 	outputPath: string
-	onProgress?: (timestamp: string) => void
+	onProgress?: (percentageComplete: number | undefined) => void
 }
 
 export const createVideo = async ({
@@ -15,6 +17,8 @@ export const createVideo = async ({
 	outputPath,
 	onProgress,
 }: VideoRequest): Promise<Result> => {
+	const audioDurationResult = await getAudioDurationInSeconds(audioPath)
+
 	try {
 		await new Promise<void>((resolve, reject) => {
 			ffmpeg()
@@ -35,9 +39,13 @@ export const createVideo = async ({
 					resolve()
 				})
 				.on('progress', ({ timemark }) => {
-					logger.info(`Current timestamp: ${timemark}`)
-					if (typeof timemark === 'string') {
-						onProgress?.(timemark)
+					const percentageComplete = getPercentageComplete(
+						timemark,
+						audioDurationResult,
+					)
+					if (percentageComplete) {
+						logger.info(`Percentage complete: ${percentageComplete}`)
+						onProgress?.(percentageComplete)
 					}
 				})
 				.on('error', ({ message }) => {
