@@ -14,7 +14,7 @@ export type ServerContext = {
 export const getServerContext = async (): Promise<ServerContext> => ({
 	s3: {
 		client: new S3Client({ region: env.AWS_REGION }),
-		uploadBucket: env.UPLOAD_BUCKET,
-		downloadBucket: env.DOWNLOAD_BUCKET,
+		uploadBucket: env.INPUT_BUCKET,
+		downloadBucket: env.OUTPUT_BUCKET,
 	},
 })

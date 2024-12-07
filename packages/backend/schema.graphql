@@ -33,6 +33,8 @@ type NormaliseAudioResponse {
 input CreateVideoInput {
 	audioFilename: String!
 	imageFilename: String!
+	enableAudioNormalisation: Boolean
+	normaliseAudioSettings: NormaliseAudioSettings
 }
 
 type CreateVideoResponse {

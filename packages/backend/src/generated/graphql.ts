@@ -18,7 +18,9 @@ export type Scalars = {
 
 export type CreateVideoInput = {
   audioFilename: Scalars['String']['input'];
+  enableAudioNormalisation?: InputMaybe<Scalars['Boolean']['input']>;
   imageFilename: Scalars['String']['input'];
+  normaliseAudioSettings?: InputMaybe<NormaliseAudioSettings>;
 };
 
 export type CreateVideoResponse = {
