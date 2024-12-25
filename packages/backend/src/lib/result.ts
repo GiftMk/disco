@@ -40,4 +40,16 @@ export const success = <T>(value: T): Success<T> => ({
 
 export const emptySuccess = (): Success => ({ value: new Void(), error: null })
 
-export const failure = (error: string): Failure => ({ value: null, error })
+export const failure = (
+	actionPerformed: string,
+	error?: Error | unknown,
+): Failure => {
+	const errorContent = {
+		message:
+			error instanceof Error ? error.message : 'An unknown error occurred',
+		actionPerformed,
+		error: error,
+	}
+
+	return { value: null, error: JSON.stringify(errorContent) }
+}

@@ -37,7 +37,9 @@ export const getMetadata = async (
 				)
 				.on('stderr', line => loudnormJsonExtractor.consume(line))
 				.on('end', () => resolve(emptySuccess()))
-				.on('error', e => reject(failure(e.message)))
+				.on('error', e =>
+					reject(failure(`Parsing metadata for ${inputPath}`, e)),
+				)
 				.saveToFile('-')
 		})
 
@@ -53,11 +55,6 @@ export const getMetadata = async (
 		const loudnormJson = getValueOrThrow(extractResult)
 		return getMetadataFromJson(loudnormJson)
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(e.message)
-		}
-		return failure(
-			`An unknown error occurred when getting metadata for ${inputPath}`,
-		)
+		return failure(`Retrieving metadata for ${inputPath}`, e)
 	}
 }

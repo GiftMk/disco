@@ -57,10 +57,9 @@ export const createVideo = async ({
 
 		return emptySuccess()
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(e.message)
-		}
-
-		return failure('An unknown error occurred')
+		return failure(
+			`Creating video from audio ${audioPath} and image ${imagePath}`,
+			e,
+		)
 	}
 }

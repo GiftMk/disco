@@ -11,7 +11,7 @@ export const handleAudioNormalisation = async (
 ): Promise<string | null> => {
 	if (!isEnabled) return null
 
-	const normalisedAudioPath = filePath('.outputs', generateFilename('mp3'))
+	const normalisedAudioPath = filePath('outputs', generateFilename('mp3'))
 	const normaliseAudioResult = await normaliseAudio({
 		inputPath: audioPath,
 		outputPath: normalisedAudioPath,

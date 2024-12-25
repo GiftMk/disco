@@ -59,15 +59,10 @@ export const normaliseAudio = async ({
 						.info(`Started normalising audio with command ${command}`),
 				)
 				.on('end', () => resolve(emptySuccess()))
-				.on('error', e => reject(failure(e.message)))
+				.on('error', e => reject(failure(`Normalising audio ${inputPath}`, e)))
 				.saveToFile(outputPath),
 		)
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(e.message)
-		}
-		return failure(
-			`An unknown error occurred when normalising audio ${inputPath}`,
-		)
+		return failure(`Normalising audio ${inputPath}`, e)
 	}
 }

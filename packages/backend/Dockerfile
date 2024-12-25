@@ -1,4 +1,4 @@
-FROM node:23-alpine
+FROM node:lts-alpine
 
 RUN apk update
 RUN apk add --no-cache ffmpeg
@@ -16,5 +16,5 @@ RUN rm -rf node_modules
 
 EXPOSE 8080
 
-ENTRYPOINT ["npm", "run", "start"]
+ENTRYPOINT ["npm", "start"]
 

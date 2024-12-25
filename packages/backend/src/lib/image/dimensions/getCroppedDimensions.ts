@@ -26,5 +26,7 @@ export const getCroppedDimensions = (
 		scaledHeight--
 	}
 
-	return failure(`Failed to crop dimensions ${width}x${height}`)
+	return failure(
+		`Getting cropped dimensions for width:${width} and height:${height}`,
+	)
 }

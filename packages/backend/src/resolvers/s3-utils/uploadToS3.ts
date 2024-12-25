@@ -31,13 +31,6 @@ export const uploadToS3 = async (
 		await uploadToS3.done()
 		return emptySuccess()
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(
-				`Failed to upload ${key} to S3 bucket ${bucket}, the following error occurred ${e.message}`,
-			)
-		}
-		return failure(
-			'Failed to ${key} to S3 bucket ${bucket}, an unknown error occurred',
-		)
+		return failure(`Uploading ${key} to S3 bucket ${bucket}`, e)
 	}
 }

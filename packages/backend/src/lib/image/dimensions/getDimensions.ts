@@ -22,7 +22,7 @@ export const getDimensions = async (
 	const height = dataStream?.height
 
 	if (!width || !height) {
-		return failure(`Failed to get dimensions for image '${imagePath}'`)
+		return failure(`Getting dimensions for image '${imagePath}'`)
 	}
 
 	return success({ width, height })

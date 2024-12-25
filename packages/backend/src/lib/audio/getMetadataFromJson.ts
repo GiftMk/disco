@@ -18,21 +18,6 @@ export const getMetadataFromJson = (json: {
 			targetOffset: Number(json.target_offset),
 		})
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(
-				`Failed to convert JSON ${JSON.stringify(
-					json,
-					null,
-					2,
-				)} into Loudnorm metadata. The following error occurred ${e.message}`,
-			)
-		}
-		return failure(
-			`Failed to convert JSON ${JSON.stringify(
-				json,
-				null,
-				2,
-			)} into Loudnorm metadata. An unknown error occurred`,
-		)
+		return failure(`Converting ${json} into Loudnorm metadata`, e)
 	}
 }

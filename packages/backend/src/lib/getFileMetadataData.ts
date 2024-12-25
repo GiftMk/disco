@@ -17,11 +17,6 @@ export const getFileMetadata = async (
 
 		return success(data)
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(e.message)
-		}
-		return failure(
-			`An unknown error occurred when reading metadata for file ${filePath}`,
-		)
+		return failure(`Reading metadata for file ${filePath}`, e)
 	}
 }

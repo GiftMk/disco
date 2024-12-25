@@ -49,16 +49,11 @@ export const resizeImage = async ({
 					resolve(emptySuccess())
 				})
 				.on('error', e => {
-					reject(failure(e.message))
+					reject(failure(`Resizing image '${outputPath}'`, e))
 				})
 				.saveToFile(outputPath)
 		})
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(e.message)
-		}
-		return failure(
-			`An unknown error occurred while resizing image '${outputPath}'`,
-		)
+		return failure(`Resizing image '${outputPath}'`, e)
 	}
 }

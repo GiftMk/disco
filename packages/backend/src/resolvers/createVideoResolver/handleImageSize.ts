@@ -5,7 +5,7 @@ import { resizeImage } from '../../lib/image/resizeImage'
 import { SixteenByNine } from '../../lib/image/dimensions/AspectRatio'
 
 export const handleImageSize = async (imagePath: string): Promise<string> => {
-	const resizedImagePath = filePath('.outputs', generateFilename('png'))
+	const resizedImagePath = filePath('outputs', generateFilename('png'))
 
 	const resizeImageResult = await resizeImage({
 		inputPath: imagePath,

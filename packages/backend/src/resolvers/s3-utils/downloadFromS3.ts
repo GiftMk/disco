@@ -17,14 +17,8 @@ export const downloadFromS3 = async (
 		if (isFailure(writeBodyResult)) {
 			return writeBodyResult
 		}
-
 		return emptySuccess()
 	} catch (e) {
-		if (e instanceof Error) {
-			return failure(e.message)
-		}
-		return failure(
-			`An unknown error occurred when downloading key ${key} from S3 bucket ${bucket}`,
-		)
+		return failure(`Downloading ${key} from S3 bucket ${bucket}`, e)
 	}
 }

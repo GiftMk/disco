@@ -18,7 +18,7 @@ export const getAudioDurationInSeconds = async (
 	const duration = metadata.format.duration
 
 	if (duration === undefined) {
-		return failure(`Failed to retrieve duration for audio file ${audioPath}`)
+		return failure(`Retrieving duration for audio file ${audioPath}`)
 	}
 
 	return success(duration)

@@ -27,12 +27,10 @@ export class LoudnormJsonExtractor {
 			const object = JSON.parse(this.lines.join(''))
 			return success(object)
 		} catch (e) {
-			if (e instanceof Error) {
-				return failure(
-					`Failed to extract Loudnorm JSON. The following error occurred ${e.message}`,
-				)
-			}
-			return failure('An unknown error occurred when extracting Loudnorm JSON')
+			return failure(
+				`Locating loudnorm settings from parsed json lines ${this.lines.join('')}`,
+				e,
+			)
 		} finally {
 			this.reset()
 		}

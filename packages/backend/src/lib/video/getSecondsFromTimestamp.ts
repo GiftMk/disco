@@ -7,7 +7,7 @@ export const getSecondsFromTimestamp = (timestamp: string): Result<number> => {
 	const seconds = Number(sections[2])
 
 	if (Number.isNaN(hours) || Number.isNaN(minutes) || Number.isNaN(seconds)) {
-		return failure(`Failed to parse timestamp ${timestamp}`)
+		return failure(`Parsing timestamp ${timestamp}`)
 	}
 
 	return success(hours * 60 * 60 + minutes * 60 + seconds)
