@@ -1,25 +1,21 @@
 import { getFileMetadata } from '../getFileMetadataData'
-import {
-	failure,
-	getValueOrThrow,
-	isFailure,
-	success,
-	type Result,
-} from '../result'
+import { Maybe } from '../result'
 
 export const getAudioDurationInSeconds = async (
 	audioPath: string,
-): Promise<Result<number>> => {
+): Promise<Maybe<number>> => {
 	const metadataResult = await getFileMetadata(audioPath)
-	if (isFailure(metadataResult)) {
-		return metadataResult
+
+	if (metadataResult.isFailure) {
+		return Maybe.none()
 	}
-	const metadata = getValueOrThrow(metadataResult)
+
+	const metadata = metadataResult.value
 	const duration = metadata.format.duration
 
 	if (duration === undefined) {
-		return failure(`Retrieving duration for audio file ${audioPath}`)
+		return Maybe.none()
 	}
 
-	return success(duration)
+	return Maybe.from(duration)
 }

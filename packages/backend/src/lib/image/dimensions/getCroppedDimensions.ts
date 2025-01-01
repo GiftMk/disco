@@ -1,5 +1,5 @@
 import type { Dimensions } from './Dimensions'
-import { failure, type Result, success } from '../../result'
+import { Result } from '../../result'
 
 const getWidth = (height: number, ratio: number): number => {
 	return height * ratio
@@ -20,13 +20,13 @@ export const getCroppedDimensions = (
 		const scaledWidth = getWidth(scaledHeight, ratio)
 
 		if (scaledWidth <= width && isEven(scaledWidth) && isEven(scaledHeight)) {
-			return success({ width: scaledWidth, height: scaledHeight })
+			return Result.success({ width: scaledWidth, height: scaledHeight })
 		}
 
 		scaledHeight--
 	}
 
-	return failure(
-		`Getting cropped dimensions for width:${width} and height:${height}`,
+	return Result.failure(
+		`Failed to get cropped dimensions for width:${width} and height:${height}`,
 	)
 }

@@ -1,22 +1,17 @@
 import ffmpeg from 'fluent-ffmpeg'
-import { failure, success, type Result } from './result'
+import { asyncResult, type Result } from './result'
+import { logger } from './logger'
 
-export const getFileMetadata = async (
+export const getFileMetadata = (
 	filePath: string,
 ): Promise<Result<ffmpeg.FfprobeData>> => {
-	try {
-		const data = await new Promise<ffmpeg.FfprobeData>((resolve, reject) => {
-			ffmpeg(filePath).ffprobe((error, data) => {
-				if (error) {
-					reject(error)
-				} else {
-					return resolve(data)
-				}
-			})
+	return asyncResult((resolve, reject) => {
+		ffmpeg(filePath).ffprobe((error, data) => {
+			if (error) {
+				logger.error(error)
+				return reject(`Failed to get metadata for file ${filePath}`)
+			}
+			return resolve(data)
 		})
-
-		return success(data)
-	} catch (e) {
-		return failure(`Reading metadata for file ${filePath}`, e)
-	}
+	})
 }

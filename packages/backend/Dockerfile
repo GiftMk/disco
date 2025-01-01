@@ -3,7 +3,7 @@ FROM node:lts-alpine
 RUN apk update
 RUN apk add --no-cache ffmpeg
 
-WORKDIR /backend
+WORKDIR /app
 
 COPY src ./src
 COPY package.json ./
@@ -17,4 +17,3 @@ RUN rm -rf node_modules
 EXPOSE 8080
 
 ENTRYPOINT ["npm", "start"]
-

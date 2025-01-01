@@ -5,7 +5,7 @@ import type {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { PutObjectCommand, type S3Client } from '@aws-sdk/client-s3'
 import type { ServerContext } from '../serverContext'
-import { generateFilename } from '../lib/filePath'
+import { generateFilename } from '../lib/generateFilename'
 
 const URL_TIMEOUT_S = 60 * 15
 

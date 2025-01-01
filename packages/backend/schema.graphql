@@ -11,7 +11,7 @@ input UploadDetailsInput {
 }
 
 type Query {
-	healthcheck: String!
+	ping: String!
 	uploadDetails(input: UploadDetailsInput!): UploadDetails!
 }
 

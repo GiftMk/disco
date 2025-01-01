@@ -1,7 +1,7 @@
 import { Upload } from '@aws-sdk/lib-storage'
 import type { S3Client } from '@aws-sdk/client-s3'
 import type { Readable } from 'node:stream'
-import { type Result, emptySuccess, failure } from '../../lib/result'
+import { Result } from '../../lib/result'
 import { logger } from '../../lib/logger'
 import { env } from '../../environment'
 
@@ -29,8 +29,8 @@ export const uploadToS3 = async (
 		)
 
 		await uploadToS3.done()
-		return emptySuccess()
+		return Result.success()
 	} catch (e) {
-		return failure(`Uploading ${key} to S3 bucket ${bucket}`, e)
+		return Result.failure(`Failed to upload key ${key} to S3 bucket ${bucket}`)
 	}
 }

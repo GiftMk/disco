@@ -1,10 +1,4 @@
-import {
-	failure,
-	getValueOrThrow,
-	isFailure,
-	type Result,
-	success,
-} from '../../result'
+import { Result } from '../../result'
 import type { Dimensions } from './Dimensions'
 import { getFileMetadata } from '../../getFileMetadataData'
 
@@ -12,18 +6,19 @@ export const getDimensions = async (
 	imagePath: string,
 ): Promise<Result<Dimensions>> => {
 	const metadataResult = await getFileMetadata(imagePath)
-	if (isFailure(metadataResult)) {
-		return metadataResult
+
+	if (metadataResult.isFailure) {
+		return Result.failure(metadataResult.error)
 	}
 
-	const metadata = getValueOrThrow(metadataResult)
+	const metadata = metadataResult.value
 	const dataStream = metadata.streams[0]
 	const width = dataStream?.width
 	const height = dataStream?.height
 
 	if (!width || !height) {
-		return failure(`Getting dimensions for image '${imagePath}'`)
+		return Result.failure(`Failed to get dimensions for image '${imagePath}'`)
 	}
 
-	return success({ width, height })
+	return Result.success({ width, height })
 }

@@ -1,10 +1,10 @@
-import { failure, success, type Result } from '../result'
+import { Result } from '../result'
 
 export class LoudnormJsonExtractor {
 	private canRead = false
 	private lines: string[] = []
 
-	consume(line: string) {
+	ingest(line: string) {
 		if (this.canRead) {
 			this.lines.push(line)
 
@@ -20,16 +20,13 @@ export class LoudnormJsonExtractor {
 		this.lines = []
 	}
 
-	extract(): Result<{
-		[key: string]: string
-	}> {
+	extract(): Result<Record<string, string>> {
 		try {
 			const object = JSON.parse(this.lines.join(''))
-			return success(object)
+			return Result.success(object)
 		} catch (e) {
-			return failure(
-				`Locating loudnorm settings from parsed json lines ${this.lines.join('')}`,
-				e,
+			return Result.failure(
+				`Failed to locate loudnorm settings from parsed json lines ${this.lines.join('')}`,
 			)
 		} finally {
 			this.reset()

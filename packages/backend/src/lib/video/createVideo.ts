@@ -1,5 +1,5 @@
 import ffmpeg from 'fluent-ffmpeg'
-import { emptySuccess, failure, type Result } from '../result'
+import { asyncResult, type Result } from '../result'
 import { logger } from '../logger'
 import { getAudioDurationInSeconds } from './getAudioDuration'
 import { getPercentageComplete } from './getPercentageComplete'
@@ -17,49 +17,42 @@ export const createVideo = async ({
 	outputPath,
 	onProgress,
 }: VideoRequest): Promise<Result> => {
-	const audioDurationResult = await getAudioDurationInSeconds(audioPath)
+	const duration = await getAudioDurationInSeconds(audioPath)
 
-	try {
-		await new Promise<void>((resolve, reject) => {
-			ffmpeg()
-				.input(imagePath)
-				.inputFPS(1)
-				.loop()
-				.input(audioPath)
-				.audioCodec('aac')
-				.audioBitrate(320)
-				.videoCodec('libx264')
-				.outputOption('-pix_fmt', 'yuv420p')
-				.outputOption('-shortest')
-				.on('start', c =>
-					logger.info(`Started making video using command: ${c}`),
+	return asyncResult((resolve, reject) => {
+		ffmpeg()
+			.input(imagePath)
+			.inputFPS(1)
+			.loop()
+			.input(audioPath)
+			.audioCodec('aac')
+			.audioBitrate(320)
+			.videoCodec('libx264')
+			.outputOption('-pix_fmt', 'yuv420p')
+			.outputOption('-shortest')
+			.on('start', c => logger.info(`Started making video using command: ${c}`))
+			.on('end', () => {
+				logger.info(`Finished making video ${outputPath}`)
+				resolve()
+			})
+			.on('progress', ({ timemark }) => {
+				if (duration.hasNoValue) return
+
+				const percentageComplete = getPercentageComplete(
+					timemark,
+					duration.value,
 				)
-				.on('end', () => {
-					logger.info(`Finished making video ${outputPath}`)
-					resolve()
-				})
-				.on('progress', ({ timemark }) => {
-					const percentageComplete = getPercentageComplete(
-						timemark,
-						audioDurationResult,
-					)
-					if (percentageComplete) {
-						logger.info(`Percentage complete: ${percentageComplete}`)
-						onProgress?.(percentageComplete)
-					}
-				})
-				.on('error', ({ message }) => {
-					logger.error(message)
-					reject()
-				})
-				.saveToFile(outputPath)
-		})
 
-		return emptySuccess()
-	} catch (e) {
-		return failure(
-			`Creating video from audio ${audioPath} and image ${imagePath}`,
-			e,
-		)
-	}
+				if (percentageComplete.hasValue) {
+					logger.info(`Percentage complete: ${percentageComplete.value}`)
+					onProgress?.(percentageComplete.value)
+				}
+			})
+			.on('error', e => {
+				reject(
+					`Failed to create video from audio ${audioPath} and image ${imagePath}`,
+				)
+			})
+			.saveToFile(outputPath)
+	})
 }

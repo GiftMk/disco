@@ -1,11 +1,11 @@
-import { type Result, success, failure } from '../result'
+import { Result } from '../result'
 import type { LoudnormMetadata } from './LoudnormMetadata'
 
-export const getMetadataFromJson = (json: {
-	[key: string]: string
-}): Result<LoudnormMetadata> => {
+export const getMetadataFromJson = (
+	json: Record<string, string>,
+): Result<LoudnormMetadata> => {
 	try {
-		return success({
+		return Result.success({
 			inputIntegrated: Number(json.input_i),
 			inputTruePeak: Number(json.input_tp),
 			inputLoudnessRange: Number(json.input_lra),
@@ -18,6 +18,6 @@ export const getMetadataFromJson = (json: {
 			targetOffset: Number(json.target_offset),
 		})
 	} catch (e) {
-		return failure(`Converting ${json} into Loudnorm metadata`, e)
+		return Result.failure(`Failed to convert ${json} into Loudnorm metadata`)
 	}
 }

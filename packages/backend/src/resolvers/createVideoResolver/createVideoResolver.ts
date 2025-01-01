@@ -2,16 +2,18 @@ import type {
 	CreateVideoResponse,
 	MutationCreateVideoArgs,
 } from '../../generated/graphql'
-import { generateFilename, filePath } from '../../lib/filePath'
+import { tempFile } from '../../lib/tempFile'
 import { createVideo } from '../../lib/video/createVideo'
 import { pubsub } from '../../pubsub'
 import type { ServerContext } from '../../serverContext'
 import { uploadToS3 } from '../s3-utils/uploadToS3'
 import fs from 'node:fs'
 import { env } from '../../environment'
-import { handleAudioNormalisation } from './handleAudioNormalisation'
-import { handleImageSize } from './handleImageSize'
+import { handleNormalisation } from './handleNormalisation'
+import { handleResize } from './handleResize'
 import { downloadAssets } from './downloadAssets'
+import { generateFilename } from '../../lib/generateFilename'
+import { GraphQLError } from 'graphql'
 
 export const createVideoResolver = async (
 	_: unknown,
@@ -25,32 +27,47 @@ export const createVideoResolver = async (
 		normaliseAudioSettings,
 	} = args.input
 	const s3Client = contextValue.s3.client
-	const audioPath = filePath('inputs', audioFilename)
-	const imagePath = filePath('inputs', imageFilename)
+	const audioPath = tempFile(audioFilename)
+	const imagePath = tempFile(imageFilename)
 	const outputFilename = generateFilename('mp4')
-	const outputPath = filePath('outputs', outputFilename)
+	const outputPath = tempFile(outputFilename)
 
 	if (env.USE_S3) {
-		await downloadAssets({
+		const downloadResult = await downloadAssets({
 			s3Client,
 			audioFilename,
 			audioPath,
 			imageFilename,
 			imagePath,
 		})
+
+		if (downloadResult.isFailure) {
+			throw new GraphQLError(downloadResult.error)
+		}
 	}
 
-	const normalisedAudioPath = await handleAudioNormalisation(
-		Boolean(enableAudioNormalisation),
-		audioPath,
-		normaliseAudioSettings ?? undefined,
-	)
+	const results = await Promise.all([
+		handleNormalisation(
+			Boolean(enableAudioNormalisation),
+			audioPath,
+			normaliseAudioSettings ?? undefined,
+		),
+		handleResize(imagePath),
+	])
 
-	const resizedImagePath = await handleImageSize(imagePath)
+	const failedResults = results.filter(r => r.isFailure)
+
+	if (failedResults.length) {
+		const message = failedResults.map(r => r.error).join(', ')
+
+		throw new GraphQLError(message)
+	}
+
+	const [normalisationResult, resizeResult] = results
 
 	createVideo({
-		audioPath: normalisedAudioPath ?? audioPath,
-		imagePath: resizedImagePath,
+		audioPath: normalisationResult.value,
+		imagePath: resizeResult.value,
 		outputPath,
 		onProgress: percentageComplete =>
 			pubsub.publish('CREATING_VIDEO', {

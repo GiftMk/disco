@@ -1,5 +1,5 @@
 import { GetObjectCommand, type S3Client } from '@aws-sdk/client-s3'
-import { emptySuccess, failure, isFailure, type Result } from '../../lib/result'
+import { Result } from '../../lib/result'
 import { env } from '../../environment'
 import { writeBodyToFile } from './writeBodyToFile'
 
@@ -13,12 +13,10 @@ export const downloadFromS3 = async (
 		const response = await s3Client.send(
 			new GetObjectCommand({ Bucket: bucket, Key: key }),
 		)
-		const writeBodyResult = await writeBodyToFile(response.Body, outputPath)
-		if (isFailure(writeBodyResult)) {
-			return writeBodyResult
-		}
-		return emptySuccess()
+		return await writeBodyToFile(response.Body, outputPath)
 	} catch (e) {
-		return failure(`Downloading ${key} from S3 bucket ${bucket}`, e)
+		return Result.failure(
+			`Failed to download key '${key}' from S3 bucket '${bucket}'`,
+		)
 	}
 }

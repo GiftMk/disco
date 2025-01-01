@@ -67,7 +67,7 @@ export type NormaliseAudioSettings = {
 
 export type Query = {
   __typename?: 'Query';
-  healthcheck: Scalars['String']['output'];
+  ping: Scalars['String']['output'];
   uploadDetails: UploadDetails;
 };
 
@@ -221,7 +221,7 @@ export type NormaliseAudioResponseResolvers<ContextType = any, ParentType extend
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  healthcheck?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   uploadDetails?: Resolver<ResolversTypes['UploadDetails'], ParentType, ContextType, RequireFields<QueryUploadDetailsArgs, 'input'>>;
 }>;
 
