@@ -13,7 +13,7 @@ export const getMetadata = async (
 ): Promise<Result<LoudnormMetadata>> => {
 	const jsonExtractor = new LoudnormJsonExtractor()
 
-	const ingestionResult = await asyncResult<void>((resolve, reject) => {
+	const ingestionResult = await asyncResult((resolve, reject) => {
 		ffmpeg(inputPath)
 			.audioFilters([
 				{

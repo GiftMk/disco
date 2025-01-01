@@ -1,6 +1,6 @@
 import { Result } from './result'
 
-export const asyncResult = <TValue, TError = string>(
+export const asyncResult = <TValue = void, TError = string>(
 	callback: (
 		resolve: (value: TValue) => void,
 		reject: (error: TError) => void,
