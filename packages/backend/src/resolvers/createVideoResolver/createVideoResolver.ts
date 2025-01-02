@@ -1,6 +1,4 @@
 import type {
-	CreateVideoError,
-	CreateVideoPayload,
 	CreateVideoResponse,
 	MutationCreateVideoArgs,
 } from '../../generated/graphql'
@@ -35,7 +33,7 @@ export const createVideoResolver = async (
 	const outputFilename = generateFilename('mp4')
 	const outputPath = tempFile(outputFilename)
 
-	const result = await downloadAssets({
+	downloadAssets({
 		s3Client,
 		audioFilename,
 		audioPath,
@@ -70,27 +68,30 @@ export const createVideoResolver = async (
 				outputPath,
 				onProgress: percentageComplete =>
 					pubsub.publish('CREATING_VIDEO', {
-						creatingVideo: { percentageComplete },
+						creatingVideo: {
+							__typename: 'CreatingVideoPayload',
+							percentageComplete,
+						},
 					}),
 			}),
 		)
 		.chain(() =>
 			uploadToS3(s3Client, outputFilename, fs.createReadStream(outputPath)),
 		)
-		.ifRight(() =>
+		.ifLeft(message =>
 			pubsub.publish('CREATING_VIDEO', {
-				creatingVideo: { percentageComplete: 100 },
+				creatingVideo: { __typename: 'CreatingVideoError', message },
 			}),
 		)
-		.map<CreateVideoPayload>(() => ({
-			__typename: 'CreateVideoPayload',
-			outputFilename,
-		}))
-		.mapLeft<CreateVideoError>(message => ({
-			__typename: 'CreateVideoError',
-			message,
-		}))
+		.ifRight(() =>
+			pubsub.publish('CREATING_VIDEO', {
+				creatingVideo: {
+					__typename: 'CreatingVideoPayload',
+					percentageComplete: 100,
+				},
+			}),
+		)
 		.run()
 
-	return result.extract()
+	return { __typename: 'CreateVideoPayload', outputFilename: outputPath }
 }

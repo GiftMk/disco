@@ -30,6 +30,8 @@ export const uploadToS3 = (
 			)
 
 			await uploadToS3.done()
+
+			logger.info(`Finished uploading ${key} to S3 bucket ${BUCKET}`)
 		} catch {
 			throwE(`Failed to upload key ${key} to S3 bucket ${BUCKET}`)
 		}

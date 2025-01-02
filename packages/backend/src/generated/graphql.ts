@@ -45,7 +45,7 @@ export type CreatingVideoPayload = {
   percentageComplete?: Maybe<Scalars['Float']['output']>;
 };
 
-export type CreatingVideoResponse = CreateVideoError | CreateVideoPayload;
+export type CreatingVideoResponse = CreatingVideoError | CreatingVideoPayload;
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -193,7 +193,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping of union types */
 export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
   CreateVideoResponse: ( CreateVideoError ) | ( CreateVideoPayload );
-  CreatingVideoResponse: ( CreateVideoError ) | ( CreateVideoPayload );
+  CreatingVideoResponse: ( CreatingVideoError ) | ( CreatingVideoPayload );
   NormaliseAudioResponse: ( NormaliseAudioError ) | ( NormaliseAudioPayload );
   UploadDetailsResponse: ( UploadDetailsError ) | ( UploadDetailsPayload );
 }>;
@@ -276,7 +276,7 @@ export type CreatingVideoPayloadResolvers<ContextType = any, ParentType extends 
 }>;
 
 export type CreatingVideoResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatingVideoResponse'] = ResolversParentTypes['CreatingVideoResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'CreateVideoError' | 'CreateVideoPayload', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'CreatingVideoError' | 'CreatingVideoPayload', ParentType, ContextType>;
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{

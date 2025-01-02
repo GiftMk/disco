@@ -72,7 +72,7 @@ type CreatingVideoError {
 	message: String!
 }
 
-union CreatingVideoResponse = CreateVideoPayload | CreateVideoError
+union CreatingVideoResponse = CreatingVideoPayload | CreatingVideoError
 
 type Subscription {
 	creatingVideo: CreatingVideoResponse!
