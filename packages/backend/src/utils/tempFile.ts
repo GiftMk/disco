@@ -6,18 +6,18 @@ import nodeCleanup from 'node-cleanup'
 const filePaths: string[] = []
 
 export const tempFile = (filename: string): string => {
-	const filePath = path.join(os.tmpdir(), `${filename}`)
-	filePaths.push(filePath)
+  const filePath = path.join(os.tmpdir(), `${filename}`)
+  filePaths.push(filePath)
 
-	return filePath
+  return filePath
 }
 
 export const cleanupTempFiles = () => {
-	for (const filePath of filePaths) {
-		if (fs.existsSync(filePath)) {
-			fs.rmSync(filePath)
-		}
-	}
+  for (const filePath of filePaths) {
+    if (fs.existsSync(filePath)) {
+      fs.rmSync(filePath)
+    }
+  }
 }
 
 nodeCleanup(cleanupTempFiles)

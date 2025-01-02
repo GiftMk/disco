@@ -1,79 +1,79 @@
 type UploadDetailsPayload {
-	audioUploadUrl: String!
-	audioFilename: String!
-	imageUploadUrl: String!
-	imageFilename: String!
+  audioUploadUrl: String!
+  audioFilename: String!
+  imageUploadUrl: String!
+  imageFilename: String!
 }
 
 type UploadDetailsError {
-	message: String!
+  message: String!
 }
 
 union UploadDetailsResponse = UploadDetailsPayload | UploadDetailsError
 
 input UploadDetailsInput {
-	audioExtension: String!
-	imageExtension: String!
+  audioExtension: String!
+  imageExtension: String!
 }
 
 type Query {
-	ping: String!
-	uploadDetails(input: UploadDetailsInput!): UploadDetailsResponse!
+  ping: String!
+  uploadDetails(input: UploadDetailsInput!): UploadDetailsResponse!
 }
 
 input NormaliseAudioSettings {
-	integrated: Float!
-	truePeak: Float!
-	loudnessRange: Float!
+  integrated: Float!
+  truePeak: Float!
+  loudnessRange: Float!
 }
 
 input NormaliseAudioInput {
-	audioFilename: String!
-	settings: NormaliseAudioSettings
+  audioFilename: String!
+  settings: NormaliseAudioSettings
 }
 
 type NormaliseAudioPayload {
-	outputFilename: String!
+  outputFilename: String!
 }
 
 type NormaliseAudioError {
-	message: String!
+  message: String!
 }
 
 union NormaliseAudioResponse = NormaliseAudioPayload | NormaliseAudioError
 
 input CreateVideoInput {
-	audioFilename: String!
-	imageFilename: String!
-	enableAudioNormalisation: Boolean
-	normaliseAudioSettings: NormaliseAudioSettings
+  audioFilename: String!
+  imageFilename: String!
+  enableAudioNormalisation: Boolean
+  normaliseAudioSettings: NormaliseAudioSettings
 }
 
 type CreateVideoPayload {
-	outputFilename: String!
+  outputFilename: String!
 }
 
 type CreateVideoError {
-	message: String!
+  message: String!
 }
 
 union CreateVideoResponse = CreateVideoPayload | CreateVideoError
 
 type Mutation {
-	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse!
-	createVideo(input: CreateVideoInput!): CreateVideoResponse!
+  normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse!
+  createVideo(input: CreateVideoInput!): CreateVideoResponse!
 }
 
 type CreatingVideoPayload {
-	percentageComplete: Float
+  percentageComplete: Float
 }
 
 type CreatingVideoError {
-	message: String!
+  message: String!
 }
 
 union CreatingVideoResponse = CreatingVideoPayload | CreatingVideoError
 
 type Subscription {
-	creatingVideo: CreatingVideoResponse!
+  creatingVideo: CreatingVideoResponse!
 }

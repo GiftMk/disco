@@ -6,10 +6,10 @@ import { linesToObject } from './toObject'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
 
 export const getMetadata = (
-	inputPath: string,
-	settings: NormalisationSettings,
+  inputPath: string,
+  settings: NormalisationSettings,
 ): EitherAsync<string, LoudnormMetadata> => {
-	return extractLines(inputPath, settings)
-		.chain(async lines => linesToObject(lines))
-		.chain(async object => toMetadata(object))
+  return extractLines(inputPath, settings)
+    .chain(async lines => linesToObject(lines))
+    .chain(async object => toMetadata(object))
 }
