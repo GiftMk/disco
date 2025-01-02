@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { getServerContext, type ServerContext } from './serverContext'
 import { resolvers } from './resolvers'
-import { logger } from './lib/logger'
+import { logger } from './logger'
 import { createServer } from 'node:http'
 import { createSchema, createYoga } from 'graphql-yoga'
 

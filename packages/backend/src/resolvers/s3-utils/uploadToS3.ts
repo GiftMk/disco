@@ -1,7 +1,7 @@
 import { Upload } from '@aws-sdk/lib-storage'
 import type { S3Client } from '@aws-sdk/client-s3'
 import type { Readable } from 'node:stream'
-import { logger } from '../../lib/logger'
+import { logger } from '../../logger'
 import { env } from '../../environment'
 import { EitherAsync } from 'purify-ts'
 

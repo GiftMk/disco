@@ -1,6 +1,6 @@
 import { getAudioDuration } from './getAudioDuration'
 import { getFileMetadata } from '../utils/getFileMetadataData'
-import { logger } from '../logger'
+import { logger } from '../../logger'
 import { getPercentageComplete } from './getPercentageComplete'
 import { toEitherAsync } from '../utils/eitherAsync'
 import ffmpeg from 'fluent-ffmpeg'

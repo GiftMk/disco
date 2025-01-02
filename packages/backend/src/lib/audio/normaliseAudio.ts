@@ -4,7 +4,7 @@ import type { LoudnormMetadata } from './getMetadata'
 import { toEitherAsync } from '../utils/eitherAsync'
 import ffmpeg from 'fluent-ffmpeg'
 import { getInputOptions } from './getInputOptions'
-import { logger } from '../logger'
+import { logger } from '../../logger'
 import type { EitherAsync } from 'purify-ts'
 
 type NormaliseAudioProps = {
