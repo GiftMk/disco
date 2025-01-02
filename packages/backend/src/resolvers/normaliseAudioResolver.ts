@@ -1,10 +1,12 @@
 import type {
 	MutationNormaliseAudioArgs,
+	NormaliseAudioError,
+	NormaliseAudioPayload,
 	NormaliseAudioResponse,
 } from '../generated/graphql'
 import { normaliseAudio } from '../lib/audio/normaliseAudio'
-import { tempFile } from '../lib/tempFile'
-import { generateFilename } from '../lib/generateFilename'
+import { tempFile } from '../lib/utils/tempFile'
+import { generateFilename } from '../lib/utils/generateFilename'
 import { defaultSettings } from '../lib/audio/defaultSettings'
 
 export const normaliseAudioResolver = async (
@@ -19,11 +21,16 @@ export const normaliseAudioResolver = async (
 		inputPath,
 		outputPath,
 		settings: settings ?? defaultSettings,
-	}).run()
+	})
+		.map<NormaliseAudioPayload>(() => ({
+			__typename: 'NormaliseAudioPayload',
+			outputFilename: outputPath,
+		}))
+		.mapLeft<NormaliseAudioError>(message => ({
+			__typename: 'NormaliseAudioError',
+			message,
+		}))
+		.run()
 
-	if (result.isRight()) {
-		return { outputFilename: outputPath }
-	}
-
-	return { outputFilename: 'TODO handle failure case' }
+	return result.extract()
 }

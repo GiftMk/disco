@@ -1,5 +1,5 @@
 import { logger } from '../../logger'
-import { toEitherAsync } from '../../toEitherAsync'
+import { toEitherAsync } from '../../utils/eitherAsync'
 import { getInputOptions } from '../getInputOptions'
 import type { NormalisationSettings } from '../NormalisationSettings'
 import ffmpeg from 'fluent-ffmpeg'

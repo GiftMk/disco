@@ -1,9 +1,15 @@
-type UploadDetails {
+type UploadDetailsPayload {
 	audioUploadUrl: String!
 	audioFilename: String!
 	imageUploadUrl: String!
 	imageFilename: String!
 }
+
+type UploadDetailsError {
+	message: String!
+}
+
+union UploadDetailsResponse = UploadDetailsPayload | UploadDetailsError
 
 input UploadDetailsInput {
 	audioExtension: String!
@@ -12,7 +18,7 @@ input UploadDetailsInput {
 
 type Query {
 	ping: String!
-	uploadDetails(input: UploadDetailsInput!): UploadDetails!
+	uploadDetails(input: UploadDetailsInput!): UploadDetailsResponse!
 }
 
 input NormaliseAudioSettings {
@@ -26,9 +32,15 @@ input NormaliseAudioInput {
 	settings: NormaliseAudioSettings
 }
 
-type NormaliseAudioResponse {
+type NormaliseAudioPayload {
 	outputFilename: String!
 }
+
+type NormaliseAudioError {
+	message: String!
+}
+
+union NormaliseAudioResponse = NormaliseAudioPayload | NormaliseAudioError
 
 input CreateVideoInput {
 	audioFilename: String!
@@ -37,19 +49,31 @@ input CreateVideoInput {
 	normaliseAudioSettings: NormaliseAudioSettings
 }
 
-type CreateVideoResponse {
+type CreateVideoPayload {
 	outputFilename: String!
 }
 
-type Mutation {
-	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse
-	createVideo(input: CreateVideoInput!): CreateVideoResponse
+type CreateVideoError {
+	message: String!
 }
 
-type CreatingVideoResponse {
+union CreateVideoResponse = CreateVideoPayload | CreateVideoError
+
+type Mutation {
+	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse!
+	createVideo(input: CreateVideoInput!): CreateVideoResponse!
+}
+
+type CreatingVideoPayload {
 	percentageComplete: Float
 }
 
+type CreatingVideoError {
+	message: String!
+}
+
+union CreatingVideoResponse = CreateVideoPayload | CreateVideoError
+
 type Subscription {
-	creatingVideo: CreatingVideoResponse
+	creatingVideo: CreatingVideoResponse!
 }

@@ -1,14 +1,15 @@
 import type {
 	QueryUploadDetailsArgs,
-	UploadDetails,
+	UploadDetailsError,
+	UploadDetailsPayload,
+	UploadDetailsResponse,
 } from '../generated/graphql'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { PutObjectCommand, type S3Client } from '@aws-sdk/client-s3'
 import type { ServerContext } from '../serverContext'
-import { generateFilename } from '../lib/generateFilename'
-import { MaybeAsync } from 'purify-ts/MaybeAsync'
+import { generateFilename } from '../lib/utils/generateFilename'
 import { EitherAsync } from 'purify-ts/EitherAsync'
-import { toEitherAsync } from '../lib/toEitherAsync'
+import { toEitherAsync } from '../lib/utils/eitherAsync'
 
 const URL_TIMEOUT_S = 60 * 15
 
@@ -38,7 +39,7 @@ export const uploadDetailsResolver = async (
 	_: unknown,
 	args: QueryUploadDetailsArgs,
 	contextValue: ServerContext,
-): Promise<UploadDetails> => {
+): Promise<UploadDetailsResponse> => {
 	const { audioExtension, imageExtension } = args.input
 	const audioFilename = generateFilename(audioExtension)
 	const imageFilename = generateFilename(imageExtension)
@@ -55,18 +56,18 @@ export const uploadDetailsResolver = async (
 			imageFilename,
 		),
 	])
-		.map(([audioUploadUrl, imageUploadUrl]) => ({
+		.map<UploadDetailsPayload>(([audioUploadUrl, imageUploadUrl]) => ({
+			__typename: 'UploadDetailsPayload',
 			audioUploadUrl: audioUploadUrl as string,
 			imageUploadUrl: imageUploadUrl as string,
 			audioFilename,
 			imageFilename,
 		}))
+		.mapLeft<UploadDetailsError>(message => ({
+			__typename: 'UploadDetailsError',
+			message,
+		}))
 		.run()
 
-	if (response.isRight()) {
-		return response.extract()
-	}
-
-	// TODO: handle this!!
-	return {} as UploadDetails
+	return response.extract()
 }

@@ -2,7 +2,7 @@ import { Readable } from 'node:stream'
 import fs from 'node:fs'
 import { EitherAsync } from 'purify-ts/EitherAsync'
 import { Left, Right, type Either } from 'purify-ts/Either'
-import { toEitherAsync } from '../../lib/toEitherAsync'
+import { toEitherAsync } from '../../lib/utils/eitherAsync'
 
 const toReadableStream = (body: unknown): Either<string, Readable> => {
 	if (!(body instanceof Readable)) {

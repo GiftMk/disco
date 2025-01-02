@@ -6,7 +6,7 @@ import {
 import { env } from '../../environment'
 import { writeBodyToFile } from './writeBodyToFile'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
-import { toEitherAsync } from '../../lib/toEitherAsync'
+import { toEitherAsync } from '../../lib/utils/eitherAsync'
 
 const BUCKET = env.INPUT_BUCKET
 

@@ -1,15 +1,17 @@
 import type {
+	CreateVideoError,
+	CreateVideoPayload,
 	CreateVideoResponse,
 	MutationCreateVideoArgs,
 } from '../../generated/graphql'
-import { tempFile } from '../../lib/tempFile'
+import { tempFile } from '../../lib/utils/tempFile'
 import { createVideo } from '../../lib/video/createVideo'
 import { pubsub } from '../../pubsub'
 import type { ServerContext } from '../../serverContext'
 import { uploadToS3 } from '../s3-utils/uploadToS3'
 import fs from 'node:fs'
 import { downloadAssets } from './downloadAssets'
-import { generateFilename } from '../../lib/generateFilename'
+import { generateFilename } from '../../lib/utils/generateFilename'
 import { normaliseAudio } from '../../lib/audio/normaliseAudio'
 import { defaultSettings } from '../../lib/audio/defaultSettings'
 import { EitherAsync } from 'purify-ts'
@@ -80,11 +82,15 @@ export const createVideoResolver = async (
 				creatingVideo: { percentageComplete: 100 },
 			}),
 		)
-		.map(() => outputFilename)
+		.map<CreateVideoPayload>(() => ({
+			__typename: 'CreateVideoPayload',
+			outputFilename,
+		}))
+		.mapLeft<CreateVideoError>(message => ({
+			__typename: 'CreateVideoError',
+			message,
+		}))
 		.run()
 
-	if (result.isRight()) {
-		return { outputFilename: result.extract() }
-	}
-	return { outputFilename: 'TODO: handle this properly' }
+	return result.extract()
 }

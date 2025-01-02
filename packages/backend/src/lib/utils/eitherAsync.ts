@@ -3,8 +3,8 @@ import { type Either, Left, Right } from 'purify-ts/Either'
 
 export const toEitherAsync = <TError, TValue>(
 	callback: (
-		resolve: (value: TValue) => void,
-		reject: (error: TError) => void,
+		right: (value: TValue) => void,
+		left: (error: TError) => void,
 	) => unknown,
 ): EitherAsync<TError, TValue> => {
 	const promise = new Promise<Either<TError, TValue>>((resolve, reject) => {
@@ -19,4 +19,12 @@ export const toEitherAsync = <TError, TValue>(
 	})
 
 	return EitherAsync.fromPromise(() => promise)
+}
+
+export const RightAsync = <T>(value: T): EitherAsync<never, T> => {
+	return EitherAsync.liftEither(Right(value))
+}
+
+export const LeftAsync = <T>(error: T): EitherAsync<T, never> => {
+	return EitherAsync.liftEither(Left(error))
 }

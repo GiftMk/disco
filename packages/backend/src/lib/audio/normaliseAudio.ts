@@ -1,7 +1,7 @@
 import { getMetadata } from './getMetadata/getMetadata'
 import type { NormalisationSettings } from './NormalisationSettings'
 import type { LoudnormMetadata } from './getMetadata'
-import { toEitherAsync } from '../toEitherAsync'
+import { toEitherAsync } from '../utils/eitherAsync'
 import ffmpeg from 'fluent-ffmpeg'
 import { getInputOptions } from './getInputOptions'
 import { logger } from '../logger'
@@ -45,7 +45,7 @@ const execute = ({
 					.info(`Started normalising audio with command ${command}`),
 			)
 			.on('end', () => resolve())
-			.on('error', e => reject(`Failed to normalise audio ${inputPath}`))
+			.on('error', () => reject(`Failed to normalise audio ${inputPath}`))
 			.saveToFile(outputPath),
 	)
 }
