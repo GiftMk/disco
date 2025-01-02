@@ -1,5 +1,5 @@
 export type NormalisationSettings = {
-  integrated: number
-  truePeak: number
-  loudnessRange: number
+	integrated: number
+	truePeak: number
+	loudnessRange: number
 }

@@ -9,12 +9,12 @@ const typeDefs = readFileSync('./schema.graphql', 'utf8')
 const schema = createSchema<ServerContext>({ typeDefs, resolvers })
 
 const yoga = createYoga({
-  schema,
-  context: getServerContext,
+	schema,
+	context: getServerContext,
 })
 const server = createServer(yoga)
 const PORT = 8080
 
 server.listen(PORT, () => {
-  logger.info(`🚀 Server is running on http://localhost:${PORT}/graphql`)
+	logger.info(`🚀 Server is running on http://localhost:${PORT}/graphql`)
 })
