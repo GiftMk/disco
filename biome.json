@@ -10,9 +10,7 @@
 		"ignore": ["node_modules", "generated", "dist", ".inputs", ".outputs"]
 	},
 	"formatter": {
-		"enabled": true,
-		"indentStyle": "tab",
-		"indentWidth": 2
+		"enabled": true
 	},
 	"organizeImports": {
 		"enabled": true
@@ -30,8 +28,7 @@
 			"semicolons": "asNeeded",
 			"bracketSpacing": true,
 			"lineEnding": "lf",
-			"jsxQuoteStyle": "single",
-			"indentWidth": 2
+			"jsxQuoteStyle": "single"
 		}
 	}
 }
