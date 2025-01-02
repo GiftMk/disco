@@ -8,7 +8,7 @@ import { logger } from '../logger'
 import { getFileMetadata } from '../getFileMetadataData'
 import type { Dimensions } from './dimensions/Dimensions'
 import { toEitherAsync } from '../toEitherAsync'
-import { EitherAsync } from 'purify-ts/EitherAsync'
+import type { EitherAsync } from 'purify-ts/EitherAsync'
 
 type ResizeImageProps = Readonly<{
 	inputPath: string
