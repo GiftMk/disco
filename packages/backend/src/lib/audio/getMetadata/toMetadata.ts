@@ -1,11 +1,11 @@
-import { Result } from '../result'
 import type { LoudnormMetadata } from './LoudnormMetadata'
+import { Left, Right, type Either } from 'purify-ts/Either'
 
-export const getMetadataFromJson = (
+export const toMetadata = (
 	json: Record<string, string>,
-): Result<LoudnormMetadata> => {
+): Either<string, LoudnormMetadata> => {
 	try {
-		return Result.success({
+		return Right({
 			inputIntegrated: Number(json.input_i),
 			inputTruePeak: Number(json.input_tp),
 			inputLoudnessRange: Number(json.input_lra),
@@ -17,7 +17,7 @@ export const getMetadataFromJson = (
 			normalisationType: json.normalization_type || '',
 			targetOffset: Number(json.target_offset),
 		})
-	} catch (e) {
-		return Result.failure(`Failed to convert ${json} into Loudnorm metadata`)
+	} catch {
+		return Left(`Failed to convert ${json} into Loudnorm metadata`)
 	}
 }

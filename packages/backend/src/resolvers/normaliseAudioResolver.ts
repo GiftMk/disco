@@ -1,4 +1,3 @@
-import { GraphQLError } from 'graphql'
 import type {
 	MutationNormaliseAudioArgs,
 	NormaliseAudioResponse,
@@ -6,6 +5,7 @@ import type {
 import { normaliseAudio } from '../lib/audio/normaliseAudio'
 import { tempFile } from '../lib/tempFile'
 import { generateFilename } from '../lib/generateFilename'
+import { defaultSettings } from '../lib/audio/defaultSettings'
 
 export const normaliseAudioResolver = async (
 	_: unknown,
@@ -18,12 +18,12 @@ export const normaliseAudioResolver = async (
 	const result = await normaliseAudio({
 		inputPath,
 		outputPath,
-		settings: settings ?? undefined,
-	})
+		settings: settings ?? defaultSettings,
+	}).run()
 
-	result.ifFailure(failure => {
-		throw new GraphQLError(failure.toString())
-	})
+	if (result.isRight()) {
+		return { outputFilename: outputPath }
+	}
 
-	return { outputFilename: outputPath }
+	return { outputFilename: 'TODO handle failure case' }
 }

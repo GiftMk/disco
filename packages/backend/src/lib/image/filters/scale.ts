@@ -1,11 +1,11 @@
 import type { AudioVideoFilter } from 'fluent-ffmpeg'
 
-type SizeProps = {
+type ScaleProps = Readonly<{
 	width: number
 	height: number
-}
+}>
 
-export const scale = ({ width, height }: SizeProps): AudioVideoFilter => ({
+export const scale = ({ width, height }: ScaleProps): AudioVideoFilter => ({
 	filter: 'scale',
 	options: `${width}:${height}`,
 })

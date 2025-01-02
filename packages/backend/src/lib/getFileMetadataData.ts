@@ -1,14 +1,15 @@
 import ffmpeg from 'fluent-ffmpeg'
-import { asyncResult, type Result } from './result'
-import { logger } from './logger'
+import { toEitherAsync } from './toEitherAsync'
+import type { EitherAsync } from 'purify-ts'
+
+export type FileMetadata = ffmpeg.FfprobeData
 
 export const getFileMetadata = (
 	filePath: string,
-): Promise<Result<ffmpeg.FfprobeData>> => {
-	return asyncResult((resolve, reject) => {
+): EitherAsync<string, FileMetadata> => {
+	return toEitherAsync((resolve, reject) => {
 		ffmpeg(filePath).ffprobe((error, data) => {
 			if (error) {
-				logger.error(error)
 				return reject(`Failed to get metadata for file ${filePath}`)
 			}
 			return resolve(data)

@@ -1,6 +1,7 @@
 import type { S3Client } from '@aws-sdk/client-s3'
 import { downloadFromS3 } from '../s3-utils/downloadFromS3'
-import { Result } from '../../lib/result'
+import { EitherAsync, Right } from 'purify-ts'
+import { env } from '../../environment'
 
 type DownloadAssetsProps = {
 	s3Client: S3Client
@@ -10,24 +11,19 @@ type DownloadAssetsProps = {
 	imagePath: string
 }
 
-export const downloadAssets = async ({
+export const downloadAssets = ({
 	s3Client,
 	audioFilename,
 	audioPath,
 	imageFilename,
 	imagePath,
-}: DownloadAssetsProps): Promise<Result> => {
-	const results = await Promise.all([
-		downloadFromS3(s3Client, audioFilename, audioPath),
-		downloadFromS3(s3Client, imageFilename, imagePath),
-	])
-
-	const failedResults = results.filter(r => r.isFailure)
-
-	if (failedResults.length) {
-		const message = failedResults.map(r => r.error).join(', ')
-		return Result.failure(message)
+}: DownloadAssetsProps): EitherAsync<string, void> => {
+	if (env.USE_S3) {
+		return EitherAsync.all([
+			downloadFromS3(s3Client, audioFilename, audioPath),
+			downloadFromS3(s3Client, imageFilename, imagePath),
+		]).void()
 	}
 
-	return Result.success()
+	return EitherAsync.liftEither(Right(undefined))
 }

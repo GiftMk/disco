@@ -1,36 +1,27 @@
-import ffmpeg from 'fluent-ffmpeg'
-import { asyncResult, Result } from '../result'
-import { getMetadata } from './getMetadata'
+import { getMetadata } from './getMetadata/getMetadata'
 import type { NormalisationSettings } from './NormalisationSettings'
+import type { LoudnormMetadata } from './getMetadata'
+import { toEitherAsync } from '../toEitherAsync'
+import ffmpeg from 'fluent-ffmpeg'
 import { getInputOptions } from './getInputOptions'
 import { logger } from '../logger'
+import type { EitherAsync } from 'purify-ts'
 
-const defaultSettings: Readonly<NormalisationSettings> = {
-	integrated: -16,
-	truePeak: -1.5,
-	loudnessRange: 11,
-}
-
-type NormaliseAudioRequest = {
+type NormaliseAudioProps = {
 	inputPath: string
 	outputPath: string
-	settings?: NormalisationSettings
+	settings: NormalisationSettings
 }
 
-export const normaliseAudio = async ({
+type ExecuteProps = NormaliseAudioProps & { metadata: LoudnormMetadata }
+
+const execute = ({
 	inputPath,
 	outputPath,
-	settings = defaultSettings,
-}: NormaliseAudioRequest): Promise<Result> => {
-	const metadataResult = await getMetadata(inputPath, settings)
-
-	if (metadataResult.isFailure) {
-		return Result.failure(metadataResult.error)
-	}
-
-	return asyncResult((resolve, reject) => {
-		const metadata = metadataResult.value
-
+	settings,
+	metadata,
+}: ExecuteProps): EitherAsync<string, void> => {
+	return toEitherAsync((resolve, reject) =>
 		ffmpeg(inputPath)
 			.audioFilters([
 				{
@@ -55,6 +46,15 @@ export const normaliseAudio = async ({
 			)
 			.on('end', () => resolve())
 			.on('error', e => reject(`Failed to normalise audio ${inputPath}`))
-			.saveToFile(outputPath)
-	})
+			.saveToFile(outputPath),
+	)
+}
+
+export const normaliseAudio = (
+	props: NormaliseAudioProps,
+): EitherAsync<string, void> => {
+	const { inputPath, settings } = props
+	return getMetadata(inputPath, settings).chain(metadata =>
+		execute({ ...props, metadata }),
+	)
 }

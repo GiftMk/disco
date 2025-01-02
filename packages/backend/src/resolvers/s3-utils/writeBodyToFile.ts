@@ -1,16 +1,21 @@
-import { asyncResult, Result } from '../../lib/result'
 import { Readable } from 'node:stream'
 import fs from 'node:fs'
+import { EitherAsync } from 'purify-ts/EitherAsync'
+import { Left, Right, type Either } from 'purify-ts/Either'
+import { toEitherAsync } from '../../lib/toEitherAsync'
 
-export const writeBodyToFile = async (
-	body: unknown | undefined,
-	outputPath: string,
-): Promise<Result> => {
+const toReadableStream = (body: unknown): Either<string, Readable> => {
 	if (!(body instanceof Readable)) {
-		return Result.failure('Response body is not a readable stream')
+		return Left('Response body is not a readable stream')
 	}
+	return Right(body)
+}
 
-	return asyncResult((resolve, reject) => {
+const writeToFile = (
+	body: Readable,
+	outputPath: string,
+): EitherAsync<string, void> => {
+	return toEitherAsync((resolve, reject) => {
 		const writeStream = fs.createWriteStream(outputPath)
 		body.pipe(writeStream, { end: true })
 
@@ -19,4 +24,13 @@ export const writeBodyToFile = async (
 		)
 		writeStream.on('close', () => resolve())
 	})
+}
+
+export const writeBodyToFile = (
+	body: unknown,
+	outputPath: string,
+): EitherAsync<string, void> => {
+	return EitherAsync.liftEither(toReadableStream(body)).chain(async body =>
+		writeToFile(body, outputPath),
+	)
 }

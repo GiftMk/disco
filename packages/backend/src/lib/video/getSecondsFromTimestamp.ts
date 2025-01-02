@@ -1,4 +1,4 @@
-import { Maybe } from '../result'
+import { Maybe } from 'purify-ts/Maybe'
 
 export const getSecondsFromTimestamp = (timestamp: string): Maybe<number> => {
 	const sections = timestamp.split(':')
@@ -7,8 +7,8 @@ export const getSecondsFromTimestamp = (timestamp: string): Maybe<number> => {
 	const seconds = Number(sections[2])
 
 	if (Number.isNaN(hours) || Number.isNaN(minutes) || Number.isNaN(seconds)) {
-		return Maybe.none()
+		return Maybe.empty()
 	}
 
-	return Maybe.from(hours * 60 * 60 + minutes * 60 + seconds)
+	return Maybe.of(hours * 60 * 60 + minutes * 60 + seconds)
 }

@@ -1,36 +1,37 @@
 import { Upload } from '@aws-sdk/lib-storage'
 import type { S3Client } from '@aws-sdk/client-s3'
 import type { Readable } from 'node:stream'
-import { Result } from '../../lib/result'
 import { logger } from '../../lib/logger'
 import { env } from '../../environment'
+import { EitherAsync } from 'purify-ts'
 
-export const uploadToS3 = async (
+const BUCKET = env.OUTPUT_BUCKET
+
+export const uploadToS3 = (
 	s3Client: S3Client,
 	key: string,
 	body: Readable,
-): Promise<Result> => {
-	const bucket = env.OUTPUT_BUCKET
+): EitherAsync<string, void> => {
+	return EitherAsync(async ({ throwE }) => {
+		try {
+			const uploadToS3 = new Upload({
+				client: s3Client,
+				params: {
+					Bucket: BUCKET,
+					Key: key,
+					Body: body,
+				},
+			})
 
-	try {
-		const uploadToS3 = new Upload({
-			client: s3Client,
-			params: {
-				Bucket: bucket,
-				Key: key,
-				Body: body,
-			},
-		})
+			uploadToS3.on('httpUploadProgress', ({ loaded, total }) =>
+				logger.info(
+					`Uploading ${key} to S3 bucket ${BUCKET}, uploaded ${loaded}/${total} bytes`,
+				),
+			)
 
-		uploadToS3.on('httpUploadProgress', ({ loaded, total }) =>
-			logger.info(
-				`Uploading ${key} to S3 bucket ${bucket}, uploaded ${loaded}/${total} bytes`,
-			),
-		)
-
-		await uploadToS3.done()
-		return Result.success()
-	} catch (e) {
-		return Result.failure(`Failed to upload key ${key} to S3 bucket ${bucket}`)
-	}
+			await uploadToS3.done()
+		} catch {
+			throwE(`Failed to upload key ${key} to S3 bucket ${BUCKET}`)
+		}
+	})
 }

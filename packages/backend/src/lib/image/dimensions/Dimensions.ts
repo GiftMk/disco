@@ -1,4 +1,4 @@
-export type Dimensions = {
+export type Dimensions = Readonly<{
 	width: number
 	height: number
-}
+}>

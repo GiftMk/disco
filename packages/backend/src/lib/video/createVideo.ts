@@ -1,25 +1,28 @@
-import ffmpeg from 'fluent-ffmpeg'
-import { asyncResult, type Result } from '../result'
+import { getAudioDuration } from './getAudioDuration'
+import { getFileMetadata } from '../getFileMetadataData'
 import { logger } from '../logger'
-import { getAudioDurationInSeconds } from './getAudioDuration'
 import { getPercentageComplete } from './getPercentageComplete'
+import { toEitherAsync } from '../toEitherAsync'
+import ffmpeg from 'fluent-ffmpeg'
+import type { EitherAsync } from 'purify-ts/EitherAsync'
 
-type VideoRequest = {
+type CreateVideoProps = {
 	audioPath: string
 	imagePath: string
 	outputPath: string
-	onProgress?: (percentageComplete: number | undefined) => void
+	onProgress: (percentageComplete: number | undefined) => void
 }
 
-export const createVideo = async ({
+type ExecuteProps = CreateVideoProps & { audioDuration: number }
+
+const execute = ({
 	audioPath,
 	imagePath,
 	outputPath,
+	audioDuration,
 	onProgress,
-}: VideoRequest): Promise<Result> => {
-	const duration = await getAudioDurationInSeconds(audioPath)
-
-	return asyncResult((resolve, reject) => {
+}: ExecuteProps): EitherAsync<string, void> => {
+	return toEitherAsync((resolve, reject) => {
 		ffmpeg()
 			.input(imagePath)
 			.inputFPS(1)
@@ -36,23 +39,26 @@ export const createVideo = async ({
 				resolve()
 			})
 			.on('progress', ({ timemark }) => {
-				if (duration.hasNoValue) return
-
-				const percentageComplete = getPercentageComplete(
-					timemark,
-					duration.value,
+				getPercentageComplete(timemark, audioDuration).ifJust(
+					percentageComplete => {
+						logger.info(`Percentage complete: ${percentageComplete}`)
+						onProgress(percentageComplete)
+					},
 				)
-
-				if (percentageComplete.hasValue) {
-					logger.info(`Percentage complete: ${percentageComplete.value}`)
-					onProgress?.(percentageComplete.value)
-				}
 			})
-			.on('error', e => {
+			.on('error', () =>
 				reject(
 					`Failed to create video from audio ${audioPath} and image ${imagePath}`,
-				)
-			})
+				),
+			)
 			.saveToFile(outputPath)
 	})
+}
+
+export const createVideo = (
+	props: CreateVideoProps,
+): EitherAsync<string, void> => {
+	return getFileMetadata(props.audioPath)
+		.chain(async metadata => getAudioDuration(metadata))
+		.chain(audioDuration => execute({ ...props, audioDuration }))
 }

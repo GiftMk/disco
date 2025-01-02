@@ -1,21 +1,14 @@
-import { getFileMetadata } from '../getFileMetadataData'
-import { Maybe } from '../result'
+import type { FileMetadata } from '../getFileMetadataData'
+import { Left, Right, type Either } from 'purify-ts'
 
-export const getAudioDurationInSeconds = async (
-	audioPath: string,
-): Promise<Maybe<number>> => {
-	const metadataResult = await getFileMetadata(audioPath)
-
-	if (metadataResult.isFailure) {
-		return Maybe.none()
-	}
-
-	const metadata = metadataResult.value
+export const getAudioDuration = (
+	metadata: FileMetadata,
+): Either<string, number> => {
 	const duration = metadata.format.duration
 
 	if (duration === undefined) {
-		return Maybe.none()
+		return Left('Failed to get audio duration from file metadata')
 	}
 
-	return Maybe.from(duration)
+	return Right(duration)
 }

@@ -1,24 +1,19 @@
-import { Result } from '../../result'
 import type { Dimensions } from './Dimensions'
-import { getFileMetadata } from '../../getFileMetadataData'
+import type { FileMetadata } from '../../getFileMetadataData'
+import { Left, Right, type Either } from 'purify-ts/Either'
 
-export const getDimensions = async (
-	imagePath: string,
-): Promise<Result<Dimensions>> => {
-	const metadataResult = await getFileMetadata(imagePath)
-
-	if (metadataResult.isFailure) {
-		return Result.failure(metadataResult.error)
-	}
-
-	const metadata = metadataResult.value
-	const dataStream = metadata.streams[0]
+export const getDimensions = (
+	fileMetadata: FileMetadata,
+): Either<string, Dimensions> => {
+	const dataStream = fileMetadata.streams[0]
 	const width = dataStream?.width
 	const height = dataStream?.height
 
 	if (!width || !height) {
-		return Result.failure(`Failed to get dimensions for image '${imagePath}'`)
+		return Left(
+			`Failed to get width and height from data stream'${dataStream}'`,
+		)
 	}
 
-	return Result.success({ width, height })
+	return Right({ width, height })
 }

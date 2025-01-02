@@ -1,45 +1,33 @@
 import ffmpeg from 'fluent-ffmpeg'
 import type { AspectRatio } from './dimensions/AspectRatio'
-import { getCroppedDimensions } from './dimensions/getCroppedDimensions'
+import { cropDimensions } from './dimensions/cropDimensions'
 import { getDimensions } from './dimensions/getDimensions'
 import { crop } from './filters/crop'
 import { scale } from './filters/scale'
-import { asyncResult, Result } from '../result'
 import { logger } from '../logger'
+import { getFileMetadata } from '../getFileMetadataData'
+import type { Dimensions } from './dimensions/Dimensions'
+import { toEitherAsync } from '../toEitherAsync'
+import { EitherAsync } from 'purify-ts/EitherAsync'
 
-type ResizeImageRequest = {
+type ResizeImageProps = Readonly<{
 	inputPath: string
 	aspectRatio: AspectRatio
 	outputPath: string
-}
+}>
 
-export const resizeImage = async ({
+type ExecuteProps = ResizeImageProps & { dimensions: Dimensions }
+
+const execute = ({
 	inputPath,
-	aspectRatio,
 	outputPath,
-}: ResizeImageRequest): Promise<Result> => {
-	const dimensionsResult = await getDimensions(inputPath)
-
-	if (dimensionsResult.isFailure) {
-		return Result.failure(dimensionsResult.error)
-	}
-
-	const dimensions = dimensionsResult.value
-	const croppedDimensionsResult = getCroppedDimensions(
-		dimensions,
-		aspectRatio.ratio,
-	)
-
-	if (croppedDimensionsResult.isFailure) {
-		return Result.failure(croppedDimensionsResult.error)
-	}
-
-	return asyncResult((resolve, reject) => {
-		const croppedDimensions = croppedDimensionsResult.value
-
+	aspectRatio,
+	dimensions,
+}: ExecuteProps): EitherAsync<string, void> => {
+	return toEitherAsync((resolve, reject) =>
 		ffmpeg()
 			.input(inputPath)
-			.videoFilters([crop(croppedDimensions), scale({ ...aspectRatio })])
+			.videoFilters([crop(dimensions), scale({ ...aspectRatio })])
 			.on('start', command =>
 				logger.info(`Started resizing image with command ${command}`),
 			)
@@ -48,8 +36,19 @@ export const resizeImage = async ({
 				resolve()
 			})
 			.on('error', e => {
-				reject(`Failed to resize image '${outputPath}'`)
+				logger.error(e.message)
+				reject(`Failed to resize image '${outputPath}' the following error`)
 			})
-			.saveToFile(outputPath)
-	})
+			.saveToFile(outputPath),
+	)
+}
+
+export const resizeImage = (
+	props: ResizeImageProps,
+): EitherAsync<string, void> => {
+	const { inputPath, aspectRatio } = props
+	return getFileMetadata(inputPath)
+		.chain(async metadata => getDimensions(metadata))
+		.chain(async dimensions => cropDimensions(dimensions, aspectRatio.ratio))
+		.chain(dimensions => execute({ ...props, dimensions }))
 }

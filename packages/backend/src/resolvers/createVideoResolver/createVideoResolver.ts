@@ -8,12 +8,13 @@ import { pubsub } from '../../pubsub'
 import type { ServerContext } from '../../serverContext'
 import { uploadToS3 } from '../s3-utils/uploadToS3'
 import fs from 'node:fs'
-import { env } from '../../environment'
-import { handleNormalisation } from './handleNormalisation'
-import { handleResize } from './handleResize'
 import { downloadAssets } from './downloadAssets'
 import { generateFilename } from '../../lib/generateFilename'
-import { GraphQLError } from 'graphql'
+import { normaliseAudio } from '../../lib/audio/normaliseAudio'
+import { defaultSettings } from '../../lib/audio/defaultSettings'
+import { EitherAsync } from 'purify-ts'
+import { resizeImage } from '../../lib/image/resizeImage'
+import { SixteenByNine } from '../../lib/image/dimensions/AspectRatio'
 
 export const createVideoResolver = async (
 	_: unknown,
@@ -32,60 +33,58 @@ export const createVideoResolver = async (
 	const outputFilename = generateFilename('mp4')
 	const outputPath = tempFile(outputFilename)
 
-	if (env.USE_S3) {
-		const downloadResult = await downloadAssets({
-			s3Client,
-			audioFilename,
-			audioPath,
-			imageFilename,
-			imagePath,
-		})
-
-		if (downloadResult.isFailure) {
-			throw new GraphQLError(downloadResult.error)
-		}
-	}
-
-	const results = await Promise.all([
-		handleNormalisation(
-			Boolean(enableAudioNormalisation),
-			audioPath,
-			normaliseAudioSettings ?? undefined,
-		),
-		handleResize(imagePath),
-	])
-
-	const failedResults = results.filter(r => r.isFailure)
-
-	if (failedResults.length) {
-		const message = failedResults.map(r => r.error).join(', ')
-
-		throw new GraphQLError(message)
-	}
-
-	const [normalisationResult, resizeResult] = results
-
-	createVideo({
-		audioPath: normalisationResult.value,
-		imagePath: resizeResult.value,
-		outputPath,
-		onProgress: percentageComplete =>
-			pubsub.publish('CREATING_VIDEO', {
-				creatingVideo: { percentageComplete },
-			}),
-	}).then(async () => {
-		if (env.USE_S3) {
-			await uploadToS3(
-				s3Client,
-				outputFilename,
-				fs.createReadStream(outputPath),
-			)
-		}
-
-		pubsub.publish('CREATING_VIDEO', {
-			creatingVideo: { percentageComplete: 100 },
-		})
+	const result = await downloadAssets({
+		s3Client,
+		audioFilename,
+		audioPath,
+		imageFilename,
+		imagePath,
 	})
+		.chain(() => {
+			const actions = [
+				resizeImage({
+					inputPath: imagePath,
+					aspectRatio: SixteenByNine,
+					outputPath,
+				}),
+			]
 
-	return { outputFilename }
+			if (enableAudioNormalisation) {
+				actions.push(
+					normaliseAudio({
+						inputPath: audioPath,
+						outputPath: audioPath,
+						settings: normaliseAudioSettings ?? defaultSettings,
+					}),
+				)
+			}
+
+			return EitherAsync.all(actions)
+		})
+		.chain(() =>
+			createVideo({
+				audioPath,
+				imagePath,
+				outputPath,
+				onProgress: percentageComplete =>
+					pubsub.publish('CREATING_VIDEO', {
+						creatingVideo: { percentageComplete },
+					}),
+			}),
+		)
+		.chain(() =>
+			uploadToS3(s3Client, outputFilename, fs.createReadStream(outputPath)),
+		)
+		.ifRight(() =>
+			pubsub.publish('CREATING_VIDEO', {
+				creatingVideo: { percentageComplete: 100 },
+			}),
+		)
+		.map(() => outputFilename)
+		.run()
+
+	if (result.isRight()) {
+		return { outputFilename: result.extract() }
+	}
+	return { outputFilename: 'TODO: handle this properly' }
 }
