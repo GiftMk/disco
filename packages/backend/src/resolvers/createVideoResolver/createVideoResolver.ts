@@ -4,14 +4,14 @@ import type {
 	CreateVideoResponse,
 	MutationCreateVideoArgs,
 } from '../../generated/graphql'
-import { tempFile } from '../../lib/utils/tempFile'
+import { tempFile } from '../../utils/tempFile'
 import { createVideo } from '../../lib/video/createVideo'
 import { pubsub } from '../../pubsub'
 import type { ServerContext } from '../../serverContext'
 import { uploadToS3 } from '../s3-utils/uploadToS3'
 import fs from 'node:fs'
 import { downloadAssets } from './downloadAssets'
-import { generateFilename } from '../../lib/utils/generateFilename'
+import { generateFilename } from '../../utils/generateFilename'
 import { normaliseAudio } from '../../lib/audio/normaliseAudio'
 import { defaultSettings } from '../../lib/audio/defaultSettings'
 import { EitherAsync } from 'purify-ts'

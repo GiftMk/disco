@@ -5,8 +5,8 @@ import type {
 	NormaliseAudioResponse,
 } from '../generated/graphql'
 import { normaliseAudio } from '../lib/audio/normaliseAudio'
-import { tempFile } from '../lib/utils/tempFile'
-import { generateFilename } from '../lib/utils/generateFilename'
+import { tempFile } from '../utils/tempFile'
+import { generateFilename } from '../utils/generateFilename'
 import { defaultSettings } from '../lib/audio/defaultSettings'
 
 export const normaliseAudioResolver = async (

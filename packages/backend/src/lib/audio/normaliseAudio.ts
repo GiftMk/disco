@@ -1,7 +1,7 @@
 import { getMetadata } from './getMetadata/getMetadata'
 import type { NormalisationSettings } from './NormalisationSettings'
 import type { LoudnormMetadata } from './getMetadata'
-import { toEitherAsync } from '../utils/eitherAsync'
+import { toEitherAsync } from '../../utils/eitherAsync'
 import ffmpeg from 'fluent-ffmpeg'
 import { getInputOptions } from './getInputOptions'
 import { logger } from '../../logger'

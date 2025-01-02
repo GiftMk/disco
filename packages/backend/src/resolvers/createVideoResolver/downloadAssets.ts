@@ -2,7 +2,7 @@ import type { S3Client } from '@aws-sdk/client-s3'
 import { downloadFromS3 } from '../s3-utils/downloadFromS3'
 import { EitherAsync } from 'purify-ts'
 import { env } from '../../environment'
-import { RightAsync } from '../../lib/utils/eitherAsync'
+import { RightAsync } from '../../utils/eitherAsync'
 
 type DownloadAssetsProps = {
 	s3Client: S3Client

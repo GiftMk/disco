@@ -5,9 +5,9 @@ import { getDimensions } from './dimensions/getDimensions'
 import { crop } from './filters/crop'
 import { scale } from './filters/scale'
 import { logger } from '../../logger'
-import { getFileMetadata } from '../utils/getFileMetadataData'
+import { getFileMetadata } from '../../utils/getFileMetadataData'
 import type { Dimensions } from './dimensions/Dimensions'
-import { toEitherAsync } from '../utils/eitherAsync'
+import { toEitherAsync } from '../../utils/eitherAsync'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
 
 type ResizeImageProps = Readonly<{
