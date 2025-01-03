@@ -6,6 +6,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import { getInputOptions } from './getInputOptions'
 import { logger } from '../../logger'
 import type { EitherAsync } from 'purify-ts'
+import { NormaliseAudioError } from './NormaliseAudioError'
 
 type NormaliseAudioProps = {
 	inputPath: string
@@ -20,7 +21,7 @@ const execute = ({
 	outputPath,
 	settings,
 	metadata,
-}: ExecuteProps): EitherAsync<string, void> => {
+}: ExecuteProps): EitherAsync<NormaliseAudioError, void> => {
 	return toEitherAsync((resolve, reject) =>
 		ffmpeg(inputPath)
 			.audioFilters([
@@ -45,14 +46,18 @@ const execute = ({
 					.info(`Started normalising audio with command ${command}`),
 			)
 			.on('end', () => resolve())
-			.on('error', () => reject(`Failed to normalise audio ${inputPath}`))
+			.on('error', () =>
+				reject(
+					new NormaliseAudioError(`Failed to normalise audio ${inputPath}`),
+				),
+			)
 			.saveToFile(outputPath),
 	)
 }
 
 export const normaliseAudio = (
 	props: NormaliseAudioProps,
-): EitherAsync<string, void> => {
+): EitherAsync<NormaliseAudioError, void> => {
 	const { inputPath, settings } = props
 	return getMetadata(inputPath, settings).chain(metadata =>
 		execute({ ...props, metadata }),

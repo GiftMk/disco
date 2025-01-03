@@ -1,6 +1,5 @@
 import type {
 	QueryUploadDetailsArgs,
-	UploadDetailsError,
 	UploadDetailsPayload,
 	UploadDetailsResponse,
 } from '../generated/graphql'
@@ -10,6 +9,9 @@ import type { ServerContext } from '../serverContext'
 import { generateFilename } from '../utils/generateFilename'
 import { EitherAsync } from 'purify-ts/EitherAsync'
 import { toEitherAsync } from '../utils/eitherAsync'
+import { GenericError } from '../lib/GenericError'
+import { logger } from '../logger'
+import { toGraphQLError } from '../utils/errors'
 
 const URL_TIMEOUT_S = 60 * 15
 
@@ -17,7 +19,7 @@ const getUploadUrl = (
 	s3Client: S3Client,
 	bucket: string,
 	key: string,
-): EitherAsync<string, string> => {
+): EitherAsync<GenericError, string> => {
 	const command = new PutObjectCommand({
 		Bucket: bucket,
 		Key: key,
@@ -30,7 +32,11 @@ const getUploadUrl = (
 			})
 			resolve(url)
 		} catch {
-			reject(`Failed to get signed url for key ${key} in bucket ${bucket}`)
+			reject(
+				new GenericError(
+					`Failed to get signed url for key ${key} in bucket ${bucket}`,
+				),
+			)
 		}
 	})
 }
@@ -63,10 +69,8 @@ export const uploadDetailsResolver = async (
 			audioFilename,
 			imageFilename,
 		}))
-		.mapLeft<UploadDetailsError>(message => ({
-			__typename: 'UploadDetailsError',
-			message,
-		}))
+		.mapLeft(toGraphQLError)
+		.ifLeft(e => logger.error(e.toString()))
 		.run()
 
 	return response.extract()

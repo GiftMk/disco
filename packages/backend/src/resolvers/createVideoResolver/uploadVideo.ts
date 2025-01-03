@@ -1,7 +1,10 @@
 import type { S3Client } from '@aws-sdk/client-s3'
 import { env } from '../../environment'
-import { uploadToS3 } from '../s3-utils/uploadToS3'
+import { uploadToS3 } from '../../utils/uploadToS3'
 import fs from 'node:fs'
+import type { EitherAsync } from 'purify-ts'
+import { RightAsync } from '../../utils/eitherAsync'
+import type { GenericError } from '../../lib/GenericError'
 
 type UploadVideoProps = {
 	s3Client: S3Client
@@ -9,13 +12,13 @@ type UploadVideoProps = {
 	videoPath: string
 }
 
-export const uploadVideo = async ({
+export const uploadVideo = ({
 	s3Client,
 	videoFilename,
 	videoPath,
-}: UploadVideoProps) => {
+}: UploadVideoProps): EitherAsync<GenericError, void> => {
 	if (!env.USE_S3) {
-		return
+		return RightAsync(undefined)
 	}
-	await uploadToS3(s3Client, videoFilename, fs.createReadStream(videoPath))
+	return uploadToS3(s3Client, videoFilename, fs.createReadStream(videoPath))
 }

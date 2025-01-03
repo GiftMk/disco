@@ -1,3 +1,7 @@
+type GenericError {
+	message: String!
+}
+
 type UploadDetailsPayload {
 	audioUploadUrl: String!
 	audioFilename: String!
@@ -9,7 +13,7 @@ type UploadDetailsError {
 	message: String!
 }
 
-union UploadDetailsResponse = UploadDetailsPayload | UploadDetailsError
+union UploadDetailsResponse = UploadDetailsPayload | GenericError | UploadDetailsError
 
 input UploadDetailsInput {
 	audioExtension: String!
@@ -40,7 +44,7 @@ type NormaliseAudioError {
 	message: String!
 }
 
-union NormaliseAudioResponse = NormaliseAudioPayload | NormaliseAudioError
+union NormaliseAudioResponse = NormaliseAudioPayload | GenericError | NormaliseAudioError
 
 input CreateVideoInput {
 	audioFilename: String!
@@ -50,30 +54,33 @@ input CreateVideoInput {
 }
 
 type CreateVideoPayload {
-	outputFilename: String!
+	trackingId: ID!
+}
+
+type ResizeImageError {
+	message: String!
 }
 
 type CreateVideoError {
 	message: String!
 }
 
-union CreateVideoResponse = CreateVideoPayload | CreateVideoError
-
 type Mutation {
 	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse!
-	createVideo(input: CreateVideoInput!): CreateVideoResponse!
+	createVideo(input: CreateVideoInput!): CreateVideoPayload!
 }
 
 type CreatingVideoPayload {
-	percentageComplete: Float
+	percentageComplete: Float!
+	outputFilename: String
 }
 
 type CreatingVideoError {
 	message: String!
 }
 
-union CreatingVideoResponse = CreatingVideoPayload | CreatingVideoError
+union CreatingVideoResponse = CreatingVideoPayload | GenericError | CreateVideoError | NormaliseAudioError | ResizeImageError
 
 type Subscription {
-	creatingVideo: CreatingVideoResponse!
+	creatingVideo(trackingId: ID!): CreatingVideoResponse!
 }

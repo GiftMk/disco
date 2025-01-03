@@ -1,5 +1,6 @@
 import { EitherAsync } from 'purify-ts/EitherAsync'
 import { type Either, Left, Right } from 'purify-ts/Either'
+import { logger } from '../logger'
 
 export const toEitherAsync = <TError, TValue>(
 	callback: (
@@ -7,12 +8,12 @@ export const toEitherAsync = <TError, TValue>(
 		left: (error: TError) => void,
 	) => unknown,
 ): EitherAsync<TError, TValue> => {
-	const promise = new Promise<Either<TError, TValue>>((resolve, reject) => {
+	const promise = new Promise<Either<TError, TValue>>(resolve => {
 		const resolveRight = (value: TValue) => {
 			resolve(Right(value))
 		}
 		const rejectLeft = (error: TError) => {
-			reject(Left(error))
+			resolve(Left(error))
 		}
 
 		callback(resolveRight, rejectLeft)

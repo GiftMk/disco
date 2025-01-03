@@ -1,13 +1,16 @@
 import type { FileMetadata } from '../../utils/getFileMetadataData'
 import { Left, Right, type Either } from 'purify-ts'
+import { CreateVideoError } from './CreateVideoError'
 
 export const getAudioDuration = (
 	metadata: FileMetadata,
-): Either<string, number> => {
+): Either<CreateVideoError, number> => {
 	const duration = metadata.format.duration
 
 	if (duration === undefined) {
-		return Left('Failed to get audio duration from file metadata')
+		return Left(
+			new CreateVideoError('Failed to get audio duration from file metadata'),
+		)
 	}
 
 	return Right(duration)

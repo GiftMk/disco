@@ -1,7 +1,7 @@
 import type { Resolvers } from '../generated/graphql'
-import { pubsub } from '../pubsub'
 import type { ServerContext } from '../serverContext'
 import { createVideoResolver } from './createVideoResolver/createVideoResolver'
+import { creatingVideoResolver } from './creatingVideoResolver'
 import { normaliseAudioResolver } from './normaliseAudioResolver'
 import { uploadDetailsResolver } from './uploadDetailsResolver'
 
@@ -15,8 +15,6 @@ export const resolvers: Resolvers<ServerContext> = {
 		createVideo: createVideoResolver,
 	},
 	Subscription: {
-		creatingVideo: {
-			subscribe: () => pubsub.subscribe('CREATING_VIDEO'),
-		},
+		creatingVideo: creatingVideoResolver(),
 	},
 }

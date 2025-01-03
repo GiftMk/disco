@@ -8,6 +8,9 @@ import { normaliseAudio } from '../lib/audio/normaliseAudio'
 import { tempFile } from '../utils/tempFile'
 import { generateFilename } from '../utils/generateFilename'
 import { defaultSettings } from '../lib/audio/defaultSettings'
+import { logger } from '../logger'
+import type { Either } from 'purify-ts'
+import { toGraphQLError } from '../utils/errors'
 
 export const normaliseAudioResolver = async (
 	_: unknown,
@@ -26,10 +29,8 @@ export const normaliseAudioResolver = async (
 			__typename: 'NormaliseAudioPayload',
 			outputFilename: outputPath,
 		}))
-		.mapLeft<NormaliseAudioError>(message => ({
-			__typename: 'NormaliseAudioError',
-			message,
-		}))
+		.mapLeft(toGraphQLError)
+		.ifLeft(e => logger.error(e.toString()))
 		.run()
 
 	return result.extract()

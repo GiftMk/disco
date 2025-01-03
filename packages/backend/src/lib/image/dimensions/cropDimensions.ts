@@ -1,5 +1,6 @@
 import { Left, Right, type Either } from 'purify-ts/Either'
 import type { Dimensions } from './Dimensions'
+import { ResizeImageError } from '../ResizeImageError'
 
 const getWidth = (height: number, ratio: number): number => {
 	return height * ratio
@@ -12,7 +13,7 @@ const isEven = (value: number): boolean => {
 export const cropDimensions = (
 	dimensions: Dimensions,
 	ratio: number,
-): Either<string, Dimensions> => {
+): Either<ResizeImageError, Dimensions> => {
 	const { width, height } = dimensions
 	let scaledHeight = height
 
@@ -27,6 +28,8 @@ export const cropDimensions = (
 	}
 
 	return Left(
-		`Failed to get cropped dimensions for width:${width} and height:${height}`,
+		new ResizeImageError(
+			`Failed to get cropped dimensions for width:${width} and height:${height}`,
+		),
 	)
 }
