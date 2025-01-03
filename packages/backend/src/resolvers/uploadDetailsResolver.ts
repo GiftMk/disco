@@ -11,7 +11,6 @@ import { EitherAsync } from 'purify-ts/EitherAsync'
 import { toEitherAsync } from '../utils/eitherAsync'
 import { GenericError } from '../lib/GenericError'
 import { logger } from '../logger'
-import { toGraphQLError } from '../utils/errors'
 
 const URL_TIMEOUT_S = 60 * 15
 
@@ -69,7 +68,10 @@ export const uploadDetailsResolver = async (
 			audioFilename,
 			imageFilename,
 		}))
-		.mapLeft(toGraphQLError)
+		.mapLeft(e => ({
+			__typename: e.type,
+			message: e.message,
+		}))
 		.ifLeft(e => logger.error(e.toString()))
 		.run()
 

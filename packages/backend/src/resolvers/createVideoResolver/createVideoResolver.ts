@@ -18,7 +18,6 @@ import type { NormaliseAudioError } from '../../lib/audio/NormaliseAudioError'
 import type { ResizeImageError } from '../../lib/image/ResizeImageError'
 import { randomUUID } from 'node:crypto'
 import { logger } from '../../logger'
-import { toGraphQLError } from '../../utils/errors'
 
 export const createVideoResolver = async (
 	_: unknown,
@@ -87,7 +86,10 @@ export const createVideoResolver = async (
 		)
 		.ifLeft(e => {
 			logger.error(e.toString())
-			pubSub.publish('creatingVideo', trackingId, toGraphQLError(e))
+			pubSub.publish('creatingVideo', trackingId, {
+				__typename: e.type,
+				message: e.message,
+			})
 		})
 		.ifRight(() =>
 			pubSub.publish('creatingVideo', trackingId, {
