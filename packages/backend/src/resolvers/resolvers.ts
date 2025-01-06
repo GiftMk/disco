@@ -1,6 +1,6 @@
 import type { Resolvers } from '../generated/graphql'
 import type { ServerContext } from '../serverContext'
-import { createVideoResolver } from './createVideoResolver/createVideoResolver'
+import { createVideoResolver } from './createVideoResolver'
 import { creatingVideoResolver } from './creatingVideoResolver'
 import { normaliseAudioResolver } from './normaliseAudioResolver'
 import { uploadDetailsResolver } from './uploadDetailsResolver'

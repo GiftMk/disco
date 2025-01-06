@@ -2,30 +2,52 @@ import { S3Client } from '@aws-sdk/client-s3'
 import { env } from './environment'
 import type { CreatingVideoResponse } from './generated/graphql'
 import { createPubSub, type PubSub } from 'graphql-yoga'
+import type { AssetRepository } from './lib/audio/assets/AssetRepository'
+import { S3Repository } from './lib/audio/assets/S3Repository'
+import { FileSystemRepository } from './lib/audio/assets/FileSystemRepository'
+import path from 'node:path'
+import os from 'node:os'
+import { TempDirectoryRepository } from './lib/tempFiles/TempDirectoryRepository'
 
 type PubSubProps = {
 	creatingVideo: [trackingId: string, payload: CreatingVideoResponse]
-	ping: [pongId: string, payload: string]
 }
 
 const pubSub = createPubSub<PubSubProps>()
 
-type S3Context = {
-	client: S3Client
-	uploadBucket: string
-	downloadBucket: string
-}
-
 export type ServerContext = {
-	s3: S3Context
 	pubSub: PubSub<PubSubProps>
+	assetRepository: AssetRepository
+	tempDirectoryRepository: TempDirectoryRepository
 }
 
-export const getServerContext = async (): Promise<ServerContext> => ({
-	s3: {
-		client: new S3Client({ region: env.AWS_REGION }),
-		uploadBucket: env.INPUT_BUCKET,
-		downloadBucket: env.OUTPUT_BUCKET,
-	},
-	pubSub,
-})
+const getAssetRepository = (
+	s3Client: S3Client,
+	isProd: boolean,
+): AssetRepository => {
+	if (isProd) {
+		return new S3Repository(s3Client, env.INPUT_BUCKET, env.OUTPUT_BUCKET)
+	}
+	return new FileSystemRepository(
+		path.join('assets', 'inputs'),
+		path.join('assets', 'outputs'),
+	)
+}
+
+const getTempDirectoryRepository = (
+	isProd: boolean,
+): TempDirectoryRepository => {
+	return new TempDirectoryRepository(
+		isProd ? os.tmpdir() : path.join('assets', 'tmp'),
+	)
+}
+
+export const getServerContext = async (): Promise<ServerContext> => {
+	const s3Client = new S3Client({ region: env.AWS_REGION })
+
+	return {
+		assetRepository: getAssetRepository(s3Client, env.isProd),
+		tempDirectoryRepository: getTempDirectoryRepository(env.isProd),
+		pubSub,
+	}
+}

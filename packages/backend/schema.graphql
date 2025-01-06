@@ -65,9 +65,11 @@ type CreateVideoError {
 	message: String!
 }
 
+union CreateVideoResponse = CreateVideoPayload | GenericError
+
 type Mutation {
 	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse!
-	createVideo(input: CreateVideoInput!): CreateVideoPayload!
+	createVideo(input: CreateVideoInput!): CreateVideoResponse!
 }
 
 type CreatingVideoPayload {

@@ -27,7 +27,9 @@ export const extractLines = (
 					.namespace('getMetadata')
 					.info(`Started normalising audio with command ${command}`),
 			)
-			.on('stderr', lines.push)
+			.on('stderr', line => {
+				lines.push(line)
+			})
 			.on('end', () => resolve(lines))
 			.on('error', () =>
 				reject(

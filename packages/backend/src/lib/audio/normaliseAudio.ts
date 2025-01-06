@@ -46,11 +46,13 @@ const execute = ({
 					.info(`Started normalising audio with command ${command}`),
 			)
 			.on('end', () => resolve())
-			.on('error', () =>
+			.on('error', (e: Error) => {
+				logger.error(e.message)
+
 				reject(
 					new NormaliseAudioError(`Failed to normalise audio ${inputPath}`),
-				),
-			)
+				)
+			})
 			.saveToFile(outputPath),
 	)
 }

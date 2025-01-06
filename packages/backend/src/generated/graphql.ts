@@ -33,6 +33,8 @@ export type CreateVideoPayload = {
   trackingId: Scalars['ID']['output'];
 };
 
+export type CreateVideoResponse = CreateVideoPayload | GenericError;
+
 export type CreatingVideoError = {
   __typename?: 'CreatingVideoError';
   message: Scalars['String']['output'];
@@ -53,7 +55,7 @@ export type GenericError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createVideo: CreateVideoPayload;
+  createVideo: CreateVideoResponse;
   normaliseAudio: NormaliseAudioResponse;
 };
 
@@ -206,6 +208,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping of union types */
 export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
+  CreateVideoResponse: ( CreateVideoPayload ) | ( GenericError );
   CreatingVideoResponse: ( CreateVideoError ) | ( CreatingVideoPayload ) | ( GenericError ) | ( NormaliseAudioError ) | ( ResizeImageError );
   NormaliseAudioResponse: ( GenericError ) | ( NormaliseAudioError ) | ( NormaliseAudioPayload );
   UploadDetailsResponse: ( GenericError ) | ( UploadDetailsError ) | ( UploadDetailsPayload );
@@ -218,6 +221,7 @@ export type ResolversTypes = ResolversObject<{
   CreateVideoError: ResolverTypeWrapper<CreateVideoError>;
   CreateVideoInput: CreateVideoInput;
   CreateVideoPayload: ResolverTypeWrapper<CreateVideoPayload>;
+  CreateVideoResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreateVideoResponse']>;
   CreatingVideoError: ResolverTypeWrapper<CreatingVideoError>;
   CreatingVideoPayload: ResolverTypeWrapper<CreatingVideoPayload>;
   CreatingVideoResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreatingVideoResponse']>;
@@ -246,6 +250,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateVideoError: CreateVideoError;
   CreateVideoInput: CreateVideoInput;
   CreateVideoPayload: CreateVideoPayload;
+  CreateVideoResponse: ResolversUnionTypes<ResolversParentTypes>['CreateVideoResponse'];
   CreatingVideoError: CreatingVideoError;
   CreatingVideoPayload: CreatingVideoPayload;
   CreatingVideoResponse: ResolversUnionTypes<ResolversParentTypes>['CreatingVideoResponse'];
@@ -278,6 +283,10 @@ export type CreateVideoPayloadResolvers<ContextType = any, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type CreateVideoResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateVideoResponse'] = ResolversParentTypes['CreateVideoResponse']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'CreateVideoPayload' | 'GenericError', ParentType, ContextType>;
+}>;
+
 export type CreatingVideoErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatingVideoError'] = ResolversParentTypes['CreatingVideoError']> = ResolversObject<{
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -299,7 +308,7 @@ export type GenericErrorResolvers<ContextType = any, ParentType extends Resolver
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  createVideo?: Resolver<ResolversTypes['CreateVideoPayload'], ParentType, ContextType, RequireFields<MutationCreateVideoArgs, 'input'>>;
+  createVideo?: Resolver<ResolversTypes['CreateVideoResponse'], ParentType, ContextType, RequireFields<MutationCreateVideoArgs, 'input'>>;
   normaliseAudio?: Resolver<ResolversTypes['NormaliseAudioResponse'], ParentType, ContextType, RequireFields<MutationNormaliseAudioArgs, 'input'>>;
 }>;
 
@@ -351,6 +360,7 @@ export type UploadDetailsResponseResolvers<ContextType = any, ParentType extends
 export type Resolvers<ContextType = any> = ResolversObject<{
   CreateVideoError?: CreateVideoErrorResolvers<ContextType>;
   CreateVideoPayload?: CreateVideoPayloadResolvers<ContextType>;
+  CreateVideoResponse?: CreateVideoResponseResolvers<ContextType>;
   CreatingVideoError?: CreatingVideoErrorResolvers<ContextType>;
   CreatingVideoPayload?: CreatingVideoPayloadResolvers<ContextType>;
   CreatingVideoResponse?: CreatingVideoResponseResolvers<ContextType>;
