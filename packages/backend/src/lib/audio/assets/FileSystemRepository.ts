@@ -1,5 +1,5 @@
 import type { EitherAsync } from 'purify-ts'
-import { GenericError } from '../../GenericError'
+import { Failure } from '../../Failure'
 import type { AssetRepository } from './AssetRepository'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -16,15 +16,12 @@ export class FileSystemRepository implements AssetRepository {
 		this.outputDirectory = outputDirectory
 	}
 
-	download(
-		filename: string,
-		outputFile: TempFile,
-	): EitherAsync<GenericError, void> {
+	download(filename: string, outputFile: TempFile): EitherAsync<Failure, void> {
 		const inputPath = path.join(this.inputDirectory, filename)
 
 		if (!fs.existsSync(inputPath)) {
 			return LeftAsync(
-				new GenericError(
+				new Failure(
 					`Asset ${filename} does not exist in local directory ${this.inputDirectory}`,
 				),
 			)
@@ -38,18 +35,16 @@ export class FileSystemRepository implements AssetRepository {
 			logger.error(e instanceof Error ? e.message : String(e))
 
 			return LeftAsync(
-				new GenericError(
+				new Failure(
 					`Failed to copy file at ${inputPath} to ${outputFile.path}`,
 				),
 			)
 		}
 	}
 
-	upload(asset: TempFile): EitherAsync<GenericError, void> {
+	upload(asset: TempFile): EitherAsync<Failure, void> {
 		if (!asset.exists()) {
-			return LeftAsync(
-				new GenericError(`Asset at ${asset.path} does not exist`),
-			)
+			return LeftAsync(new Failure(`Asset at ${asset.path} does not exist`))
 		}
 		const outputPath = path.join(this.outputDirectory, asset.name)
 
@@ -62,14 +57,12 @@ export class FileSystemRepository implements AssetRepository {
 			logger.error(e instanceof Error ? e.message : String(e))
 
 			return LeftAsync(
-				new GenericError(
-					`Failed to copy file at ${asset.path} to ${outputPath}`,
-				),
+				new Failure(`Failed to copy file at ${asset.path} to ${outputPath}`),
 			)
 		}
 	}
 
-	getUploadUrl(filename: string): EitherAsync<GenericError, string> {
+	getUploadUrl(filename: string): EitherAsync<Failure, string> {
 		throw new Error('Method not implemented.')
 	}
 }

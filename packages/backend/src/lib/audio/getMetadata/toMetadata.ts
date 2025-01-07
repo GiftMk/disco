@@ -1,10 +1,10 @@
-import { NormaliseAudioError } from '../NormaliseAudioError'
+import { Failure } from '../../Failure'
 import type { LoudnormMetadata } from './LoudnormMetadata'
 import { Left, Right, type Either } from 'purify-ts/Either'
 
 export const toMetadata = (
 	json: Record<string, string>,
-): Either<NormaliseAudioError, LoudnormMetadata> => {
+): Either<Failure, LoudnormMetadata> => {
 	try {
 		return Right({
 			inputIntegrated: Number(json.input_i),
@@ -19,10 +19,6 @@ export const toMetadata = (
 			targetOffset: Number(json.target_offset),
 		})
 	} catch {
-		return Left(
-			new NormaliseAudioError(
-				`Failed to convert ${json} into Loudnorm metadata`,
-			),
-		)
+		return Left(new Failure(`Failed to convert ${json} into Loudnorm metadata`))
 	}
 }

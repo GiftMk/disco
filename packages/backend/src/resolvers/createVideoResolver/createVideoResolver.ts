@@ -1,5 +1,4 @@
 import type {
-	GenericError,
 	CreateVideoResponse,
 	MutationCreateVideoArgs,
 } from '../../generated/graphql'
@@ -9,12 +8,11 @@ import { randomUUID } from 'node:crypto'
 import { logger } from '../../logger'
 import { concurrently } from '../../utils/eitherAsync'
 import { getExtension } from '../../utils/getExtension'
-import type { ResizeImageError } from '../../lib/image/ResizeImageError'
-import type { NormaliseAudioError } from '../../lib/audio/NormaliseAudioError'
 import { resizeImage } from '../../lib/image/resizeImage'
 import { SixteenByNine } from '../../lib/image/dimensions/AspectRatio'
 import { normaliseAudio } from '../../lib/audio/normaliseAudio'
 import { defaultSettings } from '../../lib/audio/defaultSettings'
+import { toGraphQLError } from '../../utils/toGraphQLError'
 
 export const createVideoResolver = async (
 	_: unknown,
@@ -48,16 +46,11 @@ export const createVideoResolver = async (
 	).run()
 
 	if (downloadAssetsEither.isLeft()) {
-		return downloadAssetsEither
-			.mapLeft<GenericError>(e => ({
-				__typename: 'GenericError',
-				message: e.message,
-			}))
-			.extract()
+		return downloadAssetsEither.mapLeft(toGraphQLError).extract()
 	}
 
 	await tempDirectory.lock()
-	concurrently<ResizeImageError | NormaliseAudioError, void>(
+	concurrently(
 		{
 			run: resizeImage({
 				inputPath: imageFile.path,
@@ -91,13 +84,10 @@ export const createVideoResolver = async (
 			})
 		})
 		.chain(() => assetRepository.upload(outputFile))
-		.ifLeft(e => {
-			logger.error(e.toString())
+		.ifLeft(failure => {
+			logger.error(failure.toString())
 
-			pubSub.publish('creatingVideo', trackingId, {
-				__typename: e.type,
-				message: e.message,
-			})
+			pubSub.publish('creatingVideo', trackingId, toGraphQLError(failure))
 		})
 		.ifRight(() =>
 			pubSub.publish('creatingVideo', trackingId, {

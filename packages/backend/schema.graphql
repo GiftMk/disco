@@ -1,4 +1,4 @@
-type GenericError {
+type Error {
 	message: String!
 }
 
@@ -9,11 +9,7 @@ type UploadDetailsPayload {
 	imageFilename: String!
 }
 
-type UploadDetailsError {
-	message: String!
-}
-
-union UploadDetailsResponse = UploadDetailsPayload | GenericError | UploadDetailsError
+union UploadDetailsResponse = UploadDetailsPayload | Error
 
 input UploadDetailsInput {
 	audioExtension: String!
@@ -40,11 +36,7 @@ type NormaliseAudioPayload {
 	outputFilename: String!
 }
 
-type NormaliseAudioError {
-	message: String!
-}
-
-union NormaliseAudioResponse = NormaliseAudioPayload | GenericError | NormaliseAudioError
+union NormaliseAudioResponse = NormaliseAudioPayload | Error
 
 input CreateVideoInput {
 	audioFilename: String!
@@ -57,15 +49,7 @@ type CreateVideoPayload {
 	trackingId: ID!
 }
 
-type ResizeImageError {
-	message: String!
-}
-
-type CreateVideoError {
-	message: String!
-}
-
-union CreateVideoResponse = CreateVideoPayload | GenericError
+union CreateVideoResponse = CreateVideoPayload | Error
 
 type Mutation {
 	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse!
@@ -77,11 +61,7 @@ type CreatingVideoPayload {
 	outputFilename: String
 }
 
-type CreatingVideoError {
-	message: String!
-}
-
-union CreatingVideoResponse = CreatingVideoPayload | GenericError | CreateVideoError | NormaliseAudioError | ResizeImageError
+union CreatingVideoResponse = CreatingVideoPayload | Error
 
 type Subscription {
 	creatingVideo(trackingId: ID!): CreatingVideoResponse!

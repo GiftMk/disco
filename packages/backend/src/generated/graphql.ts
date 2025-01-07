@@ -16,11 +16,6 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
-export type CreateVideoError = {
-  __typename?: 'CreateVideoError';
-  message: Scalars['String']['output'];
-};
-
 export type CreateVideoInput = {
   audioFilename: Scalars['String']['input'];
   enableAudioNormalisation?: InputMaybe<Scalars['Boolean']['input']>;
@@ -33,12 +28,7 @@ export type CreateVideoPayload = {
   trackingId: Scalars['ID']['output'];
 };
 
-export type CreateVideoResponse = CreateVideoPayload | GenericError;
-
-export type CreatingVideoError = {
-  __typename?: 'CreatingVideoError';
-  message: Scalars['String']['output'];
-};
+export type CreateVideoResponse = CreateVideoPayload | Error;
 
 export type CreatingVideoPayload = {
   __typename?: 'CreatingVideoPayload';
@@ -46,10 +36,10 @@ export type CreatingVideoPayload = {
   percentageComplete: Scalars['Float']['output'];
 };
 
-export type CreatingVideoResponse = CreateVideoError | CreatingVideoPayload | GenericError | NormaliseAudioError | ResizeImageError;
+export type CreatingVideoResponse = CreatingVideoPayload | Error;
 
-export type GenericError = {
-  __typename?: 'GenericError';
+export type Error = {
+  __typename?: 'Error';
   message: Scalars['String']['output'];
 };
 
@@ -69,11 +59,6 @@ export type MutationNormaliseAudioArgs = {
   input: NormaliseAudioInput;
 };
 
-export type NormaliseAudioError = {
-  __typename?: 'NormaliseAudioError';
-  message: Scalars['String']['output'];
-};
-
 export type NormaliseAudioInput = {
   audioFilename: Scalars['String']['input'];
   settings?: InputMaybe<NormaliseAudioSettings>;
@@ -84,7 +69,7 @@ export type NormaliseAudioPayload = {
   outputFilename: Scalars['String']['output'];
 };
 
-export type NormaliseAudioResponse = GenericError | NormaliseAudioError | NormaliseAudioPayload;
+export type NormaliseAudioResponse = Error | NormaliseAudioPayload;
 
 export type NormaliseAudioSettings = {
   integrated: Scalars['Float']['input'];
@@ -103,11 +88,6 @@ export type QueryUploadDetailsArgs = {
   input: UploadDetailsInput;
 };
 
-export type ResizeImageError = {
-  __typename?: 'ResizeImageError';
-  message: Scalars['String']['output'];
-};
-
 export type Subscription = {
   __typename?: 'Subscription';
   creatingVideo: CreatingVideoResponse;
@@ -116,11 +96,6 @@ export type Subscription = {
 
 export type SubscriptionCreatingVideoArgs = {
   trackingId: Scalars['ID']['input'];
-};
-
-export type UploadDetailsError = {
-  __typename?: 'UploadDetailsError';
-  message: Scalars['String']['output'];
 };
 
 export type UploadDetailsInput = {
@@ -136,7 +111,7 @@ export type UploadDetailsPayload = {
   imageUploadUrl: Scalars['String']['output'];
 };
 
-export type UploadDetailsResponse = GenericError | UploadDetailsError | UploadDetailsPayload;
+export type UploadDetailsResponse = Error | UploadDetailsPayload;
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -208,37 +183,32 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping of union types */
 export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
-  CreateVideoResponse: ( CreateVideoPayload ) | ( GenericError );
-  CreatingVideoResponse: ( CreateVideoError ) | ( CreatingVideoPayload ) | ( GenericError ) | ( NormaliseAudioError ) | ( ResizeImageError );
-  NormaliseAudioResponse: ( GenericError ) | ( NormaliseAudioError ) | ( NormaliseAudioPayload );
-  UploadDetailsResponse: ( GenericError ) | ( UploadDetailsError ) | ( UploadDetailsPayload );
+  CreateVideoResponse: ( CreateVideoPayload ) | ( Error );
+  CreatingVideoResponse: ( CreatingVideoPayload ) | ( Error );
+  NormaliseAudioResponse: ( Error ) | ( NormaliseAudioPayload );
+  UploadDetailsResponse: ( Error ) | ( UploadDetailsPayload );
 }>;
 
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  CreateVideoError: ResolverTypeWrapper<CreateVideoError>;
   CreateVideoInput: CreateVideoInput;
   CreateVideoPayload: ResolverTypeWrapper<CreateVideoPayload>;
   CreateVideoResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreateVideoResponse']>;
-  CreatingVideoError: ResolverTypeWrapper<CreatingVideoError>;
   CreatingVideoPayload: ResolverTypeWrapper<CreatingVideoPayload>;
   CreatingVideoResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreatingVideoResponse']>;
+  Error: ResolverTypeWrapper<Error>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
-  GenericError: ResolverTypeWrapper<GenericError>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
-  NormaliseAudioError: ResolverTypeWrapper<NormaliseAudioError>;
   NormaliseAudioInput: NormaliseAudioInput;
   NormaliseAudioPayload: ResolverTypeWrapper<NormaliseAudioPayload>;
   NormaliseAudioResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['NormaliseAudioResponse']>;
   NormaliseAudioSettings: NormaliseAudioSettings;
   Query: ResolverTypeWrapper<{}>;
-  ResizeImageError: ResolverTypeWrapper<ResizeImageError>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<{}>;
-  UploadDetailsError: ResolverTypeWrapper<UploadDetailsError>;
   UploadDetailsInput: UploadDetailsInput;
   UploadDetailsPayload: ResolverTypeWrapper<UploadDetailsPayload>;
   UploadDetailsResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UploadDetailsResponse']>;
@@ -247,35 +217,25 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
-  CreateVideoError: CreateVideoError;
   CreateVideoInput: CreateVideoInput;
   CreateVideoPayload: CreateVideoPayload;
   CreateVideoResponse: ResolversUnionTypes<ResolversParentTypes>['CreateVideoResponse'];
-  CreatingVideoError: CreatingVideoError;
   CreatingVideoPayload: CreatingVideoPayload;
   CreatingVideoResponse: ResolversUnionTypes<ResolversParentTypes>['CreatingVideoResponse'];
+  Error: Error;
   Float: Scalars['Float']['output'];
-  GenericError: GenericError;
   ID: Scalars['ID']['output'];
   Mutation: {};
-  NormaliseAudioError: NormaliseAudioError;
   NormaliseAudioInput: NormaliseAudioInput;
   NormaliseAudioPayload: NormaliseAudioPayload;
   NormaliseAudioResponse: ResolversUnionTypes<ResolversParentTypes>['NormaliseAudioResponse'];
   NormaliseAudioSettings: NormaliseAudioSettings;
   Query: {};
-  ResizeImageError: ResizeImageError;
   String: Scalars['String']['output'];
   Subscription: {};
-  UploadDetailsError: UploadDetailsError;
   UploadDetailsInput: UploadDetailsInput;
   UploadDetailsPayload: UploadDetailsPayload;
   UploadDetailsResponse: ResolversUnionTypes<ResolversParentTypes>['UploadDetailsResponse'];
-}>;
-
-export type CreateVideoErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateVideoError'] = ResolversParentTypes['CreateVideoError']> = ResolversObject<{
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type CreateVideoPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateVideoPayload'] = ResolversParentTypes['CreateVideoPayload']> = ResolversObject<{
@@ -284,12 +244,7 @@ export type CreateVideoPayloadResolvers<ContextType = any, ParentType extends Re
 }>;
 
 export type CreateVideoResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateVideoResponse'] = ResolversParentTypes['CreateVideoResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'CreateVideoPayload' | 'GenericError', ParentType, ContextType>;
-}>;
-
-export type CreatingVideoErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatingVideoError'] = ResolversParentTypes['CreatingVideoError']> = ResolversObject<{
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'CreateVideoPayload' | 'Error', ParentType, ContextType>;
 }>;
 
 export type CreatingVideoPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatingVideoPayload'] = ResolversParentTypes['CreatingVideoPayload']> = ResolversObject<{
@@ -299,10 +254,10 @@ export type CreatingVideoPayloadResolvers<ContextType = any, ParentType extends 
 }>;
 
 export type CreatingVideoResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatingVideoResponse'] = ResolversParentTypes['CreatingVideoResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'CreateVideoError' | 'CreatingVideoPayload' | 'GenericError' | 'NormaliseAudioError' | 'ResizeImageError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'CreatingVideoPayload' | 'Error', ParentType, ContextType>;
 }>;
 
-export type GenericErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['GenericError'] = ResolversParentTypes['GenericError']> = ResolversObject<{
+export type ErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = ResolversObject<{
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -312,18 +267,13 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   normaliseAudio?: Resolver<ResolversTypes['NormaliseAudioResponse'], ParentType, ContextType, RequireFields<MutationNormaliseAudioArgs, 'input'>>;
 }>;
 
-export type NormaliseAudioErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['NormaliseAudioError'] = ResolversParentTypes['NormaliseAudioError']> = ResolversObject<{
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type NormaliseAudioPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['NormaliseAudioPayload'] = ResolversParentTypes['NormaliseAudioPayload']> = ResolversObject<{
   outputFilename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type NormaliseAudioResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['NormaliseAudioResponse'] = ResolversParentTypes['NormaliseAudioResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'GenericError' | 'NormaliseAudioError' | 'NormaliseAudioPayload', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'Error' | 'NormaliseAudioPayload', ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -331,18 +281,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   uploadDetails?: Resolver<ResolversTypes['UploadDetailsResponse'], ParentType, ContextType, RequireFields<QueryUploadDetailsArgs, 'input'>>;
 }>;
 
-export type ResizeImageErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ResizeImageError'] = ResolversParentTypes['ResizeImageError']> = ResolversObject<{
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type SubscriptionResolvers<ContextType = any, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
   creatingVideo?: SubscriptionResolver<ResolversTypes['CreatingVideoResponse'], "creatingVideo", ParentType, ContextType, RequireFields<SubscriptionCreatingVideoArgs, 'trackingId'>>;
-}>;
-
-export type UploadDetailsErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['UploadDetailsError'] = ResolversParentTypes['UploadDetailsError']> = ResolversObject<{
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type UploadDetailsPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['UploadDetailsPayload'] = ResolversParentTypes['UploadDetailsPayload']> = ResolversObject<{
@@ -354,25 +294,20 @@ export type UploadDetailsPayloadResolvers<ContextType = any, ParentType extends 
 }>;
 
 export type UploadDetailsResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['UploadDetailsResponse'] = ResolversParentTypes['UploadDetailsResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'GenericError' | 'UploadDetailsError' | 'UploadDetailsPayload', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'Error' | 'UploadDetailsPayload', ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
-  CreateVideoError?: CreateVideoErrorResolvers<ContextType>;
   CreateVideoPayload?: CreateVideoPayloadResolvers<ContextType>;
   CreateVideoResponse?: CreateVideoResponseResolvers<ContextType>;
-  CreatingVideoError?: CreatingVideoErrorResolvers<ContextType>;
   CreatingVideoPayload?: CreatingVideoPayloadResolvers<ContextType>;
   CreatingVideoResponse?: CreatingVideoResponseResolvers<ContextType>;
-  GenericError?: GenericErrorResolvers<ContextType>;
+  Error?: ErrorResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
-  NormaliseAudioError?: NormaliseAudioErrorResolvers<ContextType>;
   NormaliseAudioPayload?: NormaliseAudioPayloadResolvers<ContextType>;
   NormaliseAudioResponse?: NormaliseAudioResponseResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  ResizeImageError?: ResizeImageErrorResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
-  UploadDetailsError?: UploadDetailsErrorResolvers<ContextType>;
   UploadDetailsPayload?: UploadDetailsPayloadResolvers<ContextType>;
   UploadDetailsResponse?: UploadDetailsResponseResolvers<ContextType>;
 }>;

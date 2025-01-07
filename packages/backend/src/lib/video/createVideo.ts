@@ -5,7 +5,7 @@ import { getPercentageComplete } from './getPercentageComplete'
 import { toEitherAsync } from '../../utils/eitherAsync'
 import ffmpeg from 'fluent-ffmpeg'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
-import { CreateVideoError } from './CreateVideoError'
+import { Failure } from '../Failure'
 
 type CreateVideoProps = {
 	audioPath: string
@@ -22,7 +22,7 @@ const execute = ({
 	outputPath,
 	audioDuration,
 	onProgress,
-}: ExecuteProps): EitherAsync<CreateVideoError, void> => {
+}: ExecuteProps): EitherAsync<Failure, void> => {
 	return toEitherAsync((resolve, reject) => {
 		try {
 			ffmpeg()
@@ -52,7 +52,7 @@ const execute = ({
 				})
 				.on('error', () =>
 					reject(
-						new CreateVideoError(
+						new Failure(
 							`Failed to create video from audio ${audioPath} and image ${imagePath}`,
 						),
 					),
@@ -60,7 +60,7 @@ const execute = ({
 				.saveToFile(outputPath)
 		} catch {
 			reject(
-				new CreateVideoError(
+				new Failure(
 					`Failed to create video from audio ${audioPath} and image ${imagePath}`,
 				),
 			)
@@ -70,9 +70,9 @@ const execute = ({
 
 export const createVideo = (
 	props: CreateVideoProps,
-): EitherAsync<CreateVideoError, void> => {
+): EitherAsync<Failure, void> => {
 	return getFileMetadata(props.audioPath)
-		.mapLeft(e => new CreateVideoError(e.message))
+		.mapLeft(e => new Failure(e.message))
 		.chain(async metadata => getAudioDuration(metadata))
 		.chain(audioDuration => execute({ ...props, audioDuration }))
 }

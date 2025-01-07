@@ -1,6 +1,6 @@
 import { type Either, Left, Right } from 'purify-ts/Either'
 import { EitherAsync } from 'purify-ts/EitherAsync'
-import { GenericError } from '../../GenericError'
+import { Failure } from '../../Failure'
 import type { AssetRepository } from './AssetRepository'
 import {
 	GetObjectCommand,
@@ -29,11 +29,8 @@ export class S3Repository implements AssetRepository {
 		this.outputBucket = outputBucket
 	}
 
-	download(
-		filename: string,
-		outputFile: TempFile,
-	): EitherAsync<GenericError, void> {
-		return toEitherAsync<GenericError, GetObjectCommandOutput>(
+	download(filename: string, outputFile: TempFile): EitherAsync<Failure, void> {
+		return toEitherAsync<Failure, GetObjectCommandOutput>(
 			async (resolve, reject) => {
 				try {
 					const response = await this.s3Client.send(
@@ -44,14 +41,14 @@ export class S3Repository implements AssetRepository {
 						resolve(response)
 					} else {
 						reject(
-							new GenericError(
+							new Failure(
 								`No response was returned when downloading '${filename}' from S3 bucket '${this.inputBucket}'`,
 							),
 						)
 					}
 				} catch {
 					reject(
-						new GenericError(
+						new Failure(
 							`Failed to download key '${filename}' from S3 bucket '${this.inputBucket}'`,
 						),
 					)
@@ -62,7 +59,7 @@ export class S3Repository implements AssetRepository {
 		)
 	}
 
-	upload(asset: TempFile): EitherAsync<GenericError, void> {
+	upload(asset: TempFile): EitherAsync<Failure, void> {
 		return toEitherAsync(async (resolve, reject) => {
 			try {
 				const uploadToS3 = new Upload({
@@ -88,7 +85,7 @@ export class S3Repository implements AssetRepository {
 				resolve()
 			} catch {
 				reject(
-					new GenericError(
+					new Failure(
 						`Failed to upload key ${asset.path} to S3 bucket ${this.outputBucket}`,
 					),
 				)
@@ -96,7 +93,7 @@ export class S3Repository implements AssetRepository {
 		})
 	}
 
-	getUploadUrl(filename: string): EitherAsync<GenericError, string> {
+	getUploadUrl(filename: string): EitherAsync<Failure, string> {
 		const command = new PutObjectCommand({
 			Bucket: this.inputBucket,
 			Key: filename,
@@ -110,7 +107,7 @@ export class S3Repository implements AssetRepository {
 				resolve(url)
 			} catch {
 				reject(
-					new GenericError(
+					new Failure(
 						`Failed to get signed url for key ${filename} in bucket ${this.inputBucket}`,
 					),
 				)
@@ -118,11 +115,9 @@ export class S3Repository implements AssetRepository {
 		})
 	}
 
-	private static toReadableStream(
-		body: unknown,
-	): Either<GenericError, Readable> {
+	private static toReadableStream(body: unknown): Either<Failure, Readable> {
 		if (!(body instanceof Readable)) {
-			return Left(new GenericError('Response body is not a readable stream'))
+			return Left(new Failure('Response body is not a readable stream'))
 		}
 		return Right(body)
 	}
@@ -130,14 +125,14 @@ export class S3Repository implements AssetRepository {
 	private static writeToFile(
 		body: Readable,
 		outputPath: string,
-	): EitherAsync<GenericError, void> {
+	): EitherAsync<Failure, void> {
 		return toEitherAsync((resolve, reject) => {
 			const writeStream = fs.createWriteStream(outputPath)
 			body.pipe(writeStream, { end: true })
 
 			writeStream.on('error', () =>
 				reject(
-					new GenericError(`Failed to write stream body to file ${outputPath}`),
+					new Failure(`Failed to write stream body to file ${outputPath}`),
 				),
 			)
 			writeStream.on('close', () => resolve())
@@ -147,7 +142,7 @@ export class S3Repository implements AssetRepository {
 	private static writeBodyToFile(
 		body: unknown,
 		outputPath: string,
-	): EitherAsync<GenericError, void> {
+	): EitherAsync<Failure, void> {
 		return EitherAsync.liftEither(S3Repository.toReadableStream(body)).chain(
 			async body => S3Repository.writeToFile(body, outputPath),
 		)

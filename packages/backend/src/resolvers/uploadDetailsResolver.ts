@@ -7,6 +7,7 @@ import type { ServerContext } from '../serverContext'
 import { concurrently } from '../utils/eitherAsync'
 import { logger } from '../logger'
 import { randomUUID } from 'node:crypto'
+import { toGraphQLError } from '../utils/toGraphQLError'
 
 export const uploadDetailsResolver = async (
 	_: unknown,
@@ -27,11 +28,8 @@ export const uploadDetailsResolver = async (
 			audioFilename: randomUUID(),
 			imageFilename: randomUUID(),
 		}))
-		.mapLeft(e => ({
-			__typename: e.type,
-			message: e.message,
-		}))
-		.ifLeft(e => logger.error(e.toString()))
+		.ifLeft(failure => logger.error(failure.toString()))
+		.mapLeft(toGraphQLError)
 		.run()
 
 	return response.extract()

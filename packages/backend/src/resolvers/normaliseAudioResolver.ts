@@ -8,6 +8,7 @@ import { defaultSettings } from '../lib/audio/defaultSettings'
 import { logger } from '../logger'
 import { getExtension } from '../utils/getExtension'
 import type { ServerContext } from '../serverContext'
+import { toGraphQLError } from '../utils/toGraphQLError'
 
 export const normaliseAudioResolver = async (
 	_: unknown,
@@ -36,11 +37,8 @@ export const normaliseAudioResolver = async (
 			__typename: 'NormaliseAudioPayload',
 			outputFilename: outputFile.name,
 		}))
-		.mapLeft(e => ({
-			__typename: e.type,
-			message: e.message,
-		}))
-		.ifLeft(e => logger.error(e.message))
+		.ifLeft(failure => logger.error(failure.toString()))
+		.mapLeft(toGraphQLError)
 		.run()
 
 	return response.extract()

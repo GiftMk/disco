@@ -1,9 +1,9 @@
 import { Left, Right, type Either } from 'purify-ts/Either'
-import { NormaliseAudioError } from '../NormaliseAudioError'
+import { Failure } from '../../Failure'
 
 export const linesToObject = (
 	lines: string[],
-): Either<NormaliseAudioError, Record<string, string>> => {
+): Either<Failure, Record<string, string>> => {
 	try {
 		let canRead = false
 		const loudnormLines: string[] = []
@@ -23,7 +23,7 @@ export const linesToObject = (
 		return Right(JSON.parse(loudnormLines.join('')))
 	} catch {
 		return Left(
-			new NormaliseAudioError(
+			new Failure(
 				`Failed to locate loudnorm settings from parsed json lines '${lines.join('')}'`,
 			),
 		)

@@ -9,7 +9,7 @@ import { getFileMetadata } from '../../utils/getFileMetadataData'
 import type { Dimensions } from './dimensions/Dimensions'
 import { toEitherAsync } from '../../utils/eitherAsync'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
-import { ResizeImageError } from './ResizeImageError'
+import { Failure } from '../Failure'
 
 type ResizeImageProps = Readonly<{
 	inputPath: string
@@ -24,7 +24,7 @@ const execute = ({
 	outputPath,
 	aspectRatio,
 	dimensions,
-}: ExecuteProps): EitherAsync<ResizeImageError, void> => {
+}: ExecuteProps): EitherAsync<Failure, void> => {
 	return toEitherAsync((resolve, reject) =>
 		ffmpeg()
 			.input(inputPath)
@@ -39,7 +39,7 @@ const execute = ({
 			.on('error', e => {
 				logger.error(e.message)
 				reject(
-					new ResizeImageError(
+					new Failure(
 						`Failed to resize image '${outputPath}' the following error`,
 					),
 				)
@@ -50,10 +50,9 @@ const execute = ({
 
 export const resizeImage = (
 	props: ResizeImageProps,
-): EitherAsync<ResizeImageError, void> => {
+): EitherAsync<Failure, void> => {
 	const { inputPath, aspectRatio } = props
 	return getFileMetadata(inputPath)
-		.mapLeft(e => new ResizeImageError(e.message))
 		.chain(async metadata => getDimensions(metadata))
 		.chain(async dimensions => cropDimensions(dimensions, aspectRatio.ratio))
 		.chain(dimensions => execute({ ...props, dimensions }))
