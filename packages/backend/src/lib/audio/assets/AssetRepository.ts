@@ -4,6 +4,9 @@ import type { Failure } from '../../Failure'
 
 export interface AssetRepository {
 	download(filename: string, outputFile: TempFile): EitherAsync<Failure, void>
-	upload(file: TempFile): EitherAsync<Failure, void>
+	upload(
+		file: TempFile,
+		onProgress?: (percentageComplete: number) => void,
+	): EitherAsync<Failure, void>
 	getUploadUrl(extension: string): EitherAsync<Failure, string>
 }

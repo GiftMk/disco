@@ -72,7 +72,6 @@ export const createVideo = (
 	props: CreateVideoProps,
 ): EitherAsync<Failure, void> => {
 	return getFileMetadata(props.audioPath)
-		.mapLeft(e => new Failure(e.message))
 		.chain(async metadata => getAudioDuration(metadata))
 		.chain(audioDuration => execute({ ...props, audioDuration }))
 }

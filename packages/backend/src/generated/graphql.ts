@@ -32,11 +32,19 @@ export type CreateVideoResponse = CreateVideoPayload | Error;
 
 export type CreatingVideoPayload = {
   __typename?: 'CreatingVideoPayload';
+  currentStep: CreatingVideoStep;
   outputFilename?: Maybe<Scalars['String']['output']>;
-  percentageComplete: Scalars['Float']['output'];
+  percentageComplete?: Maybe<Scalars['Float']['output']>;
 };
 
 export type CreatingVideoResponse = CreatingVideoPayload | Error;
+
+export enum CreatingVideoStep {
+  CreatingVideo = 'CREATING_VIDEO',
+  DownloadingAssets = 'DOWNLOADING_ASSETS',
+  ProcessingAssets = 'PROCESSING_ASSETS',
+  UploadingVideo = 'UPLOADING_VIDEO'
+}
 
 export type Error = {
   __typename?: 'Error';
@@ -198,6 +206,7 @@ export type ResolversTypes = ResolversObject<{
   CreateVideoResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreateVideoResponse']>;
   CreatingVideoPayload: ResolverTypeWrapper<CreatingVideoPayload>;
   CreatingVideoResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreatingVideoResponse']>;
+  CreatingVideoStep: CreatingVideoStep;
   Error: ResolverTypeWrapper<Error>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
@@ -248,8 +257,9 @@ export type CreateVideoResponseResolvers<ContextType = any, ParentType extends R
 }>;
 
 export type CreatingVideoPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatingVideoPayload'] = ResolversParentTypes['CreatingVideoPayload']> = ResolversObject<{
+  currentStep?: Resolver<ResolversTypes['CreatingVideoStep'], ParentType, ContextType>;
   outputFilename?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  percentageComplete?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  percentageComplete?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

@@ -6,7 +6,7 @@ import { linesToObject } from './toObject'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
 import type { Failure } from '../../Failure'
 
-export const getMetadata = (
+export const getLoudnormMetadata = (
 	inputPath: string,
 	settings: NormalisationSettings,
 ): EitherAsync<Failure, LoudnormMetadata> => {

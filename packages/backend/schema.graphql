@@ -56,8 +56,16 @@ type Mutation {
 	createVideo(input: CreateVideoInput!): CreateVideoResponse!
 }
 
+enum CreatingVideoStep {
+	DOWNLOADING_ASSETS,
+	PROCESSING_ASSETS,
+	CREATING_VIDEO,
+	UPLOADING_VIDEO
+}
+
 type CreatingVideoPayload {
-	percentageComplete: Float!
+	percentageComplete: Float
+	currentStep: CreatingVideoStep!
 	outputFilename: String
 }
 

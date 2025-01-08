@@ -1,12 +1,13 @@
-import type {
-	CreateVideoResponse,
-	MutationCreateVideoArgs,
+import {
+	CreatingVideoStep,
+	type CreateVideoResponse,
+	type MutationCreateVideoArgs,
 } from '../../generated/graphql'
 import { createVideo } from '../../lib/video/createVideo'
 import type { ServerContext } from '../../serverContext'
 import { randomUUID } from 'node:crypto'
 import { logger } from '../../logger'
-import { concurrently } from '../../utils/eitherAsync'
+import { concurrently, toEitherAsync } from '../../utils/eitherAsync'
 import { getExtension } from '../../utils/getExtension'
 import { resizeImage } from '../../lib/image/resizeImage'
 import { SixteenByNine } from '../../lib/image/dimensions/AspectRatio'
@@ -40,33 +41,73 @@ export const createVideoResolver = async (
 	const outputFile = tempDirectory.newFile('mp4')
 	const trackingId = randomUUID()
 
-	const downloadAssetsEither = await concurrently(
+	await tempDirectory.lock()
+
+	toEitherAsync(async right => {
+		setTimeout(() => right(undefined), 10000)
+	}).ifRight(() =>
+		pubSub.publish('creatingVideo', trackingId, {
+			__typename: 'CreatingVideoPayload',
+			currentStep: CreatingVideoStep.DownloadingAssets,
+		}),
+	)
+	concurrently(
 		{ run: assetRepository.download(audioFilename, audioFile) },
 		{ run: assetRepository.download(imageFilename, imageFile) },
-	).run()
-
-	if (downloadAssetsEither.isLeft()) {
-		return downloadAssetsEither.mapLeft(toGraphQLError).extract()
-	}
-
-	await tempDirectory.lock()
-	concurrently(
-		{
-			run: resizeImage({
-				inputPath: imageFile.path,
-				outputPath: resizedImageFile.path,
-				aspectRatio: SixteenByNine,
-			}),
-		},
-		{
-			run: normaliseAudio({
-				inputPath: audioFile.path,
-				outputPath: normalisedAudioFile.path,
-				settings: normaliseAudioSettings ?? defaultSettings,
-			}),
-			predicate: () => normalisationIsEnabled,
-		},
 	)
+		.ifRight(() =>
+			pubSub.publish('creatingVideo', trackingId, {
+				__typename: 'CreatingVideoPayload',
+				currentStep: CreatingVideoStep.ProcessingAssets,
+				percentageComplete: 0,
+			}),
+		)
+		.chain(() => {
+			const progress = { resizeImage: 0, normaliseAudio: 0 }
+			const handleProgress = (
+				action: 'resizeImage' | 'normaliseAudio',
+				percentageComplete: number,
+			) => {
+				progress[action] = percentageComplete
+				pubSub.publish('creatingVideo', trackingId, {
+					__typename: 'CreatingVideoPayload',
+					currentStep: CreatingVideoStep.ProcessingAssets,
+					percentageComplete: Math.min(
+						progress.resizeImage,
+						progress.normaliseAudio,
+					),
+				})
+			}
+
+			return concurrently(
+				{
+					run: resizeImage({
+						inputPath: imageFile.path,
+						outputPath: resizedImageFile.path,
+						aspectRatio: SixteenByNine,
+						onProgress: percentageComplete =>
+							handleProgress('resizeImage', percentageComplete),
+					}),
+				},
+				{
+					run: normaliseAudio({
+						inputPath: audioFile.path,
+						outputPath: normalisedAudioFile.path,
+						settings: normaliseAudioSettings ?? defaultSettings,
+						onProgress: percentageComplete =>
+							handleProgress('normaliseAudio', percentageComplete),
+					}),
+					predicate: () => normalisationIsEnabled,
+				},
+			)
+		})
+		.ifRight(() =>
+			pubSub.publish('creatingVideo', trackingId, {
+				__typename: 'CreatingVideoPayload',
+				currentStep: CreatingVideoStep.CreatingVideo,
+				percentageComplete: 0,
+			}),
+		)
 		.chain(() => {
 			const audioPath = normalisationIsEnabled
 				? normalisedAudioFile.path
@@ -79,23 +120,32 @@ export const createVideoResolver = async (
 				onProgress: percentageComplete =>
 					pubSub.publish('creatingVideo', trackingId, {
 						__typename: 'CreatingVideoPayload',
+						currentStep: CreatingVideoStep.CreatingVideo,
 						percentageComplete,
 					}),
 			})
 		})
-		.chain(() => assetRepository.upload(outputFile))
+		.ifRight(() =>
+			pubSub.publish('creatingVideo', trackingId, {
+				__typename: 'CreatingVideoPayload',
+				currentStep: CreatingVideoStep.UploadingVideo,
+				percentageComplete: 0,
+			}),
+		)
+		.chain(() =>
+			assetRepository.upload(outputFile, percentageComplete =>
+				pubSub.publish('creatingVideo', trackingId, {
+					__typename: 'CreatingVideoPayload',
+					currentStep: CreatingVideoStep.UploadingVideo,
+					percentageComplete,
+				}),
+			),
+		)
 		.ifLeft(failure => {
 			logger.error(failure.toString())
 
 			pubSub.publish('creatingVideo', trackingId, toGraphQLError(failure))
 		})
-		.ifRight(() =>
-			pubSub.publish('creatingVideo', trackingId, {
-				__typename: 'CreatingVideoPayload',
-				percentageComplete: 100,
-				outputFilename: outputFile.name,
-			}),
-		)
 		.run()
 		.finally(() => tempDirectory.unlock())
 

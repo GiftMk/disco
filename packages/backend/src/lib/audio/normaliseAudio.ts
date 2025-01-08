@@ -1,4 +1,4 @@
-import { getMetadata } from './getMetadata/getMetadata'
+import { getLoudnormMetadata } from './getMetadata/getLoudnormMetadata'
 import type { NormalisationSettings } from './NormalisationSettings'
 import type { LoudnormMetadata } from './getMetadata'
 import { toEitherAsync } from '../../utils/eitherAsync'
@@ -7,20 +7,29 @@ import { getInputOptions } from './getInputOptions'
 import { logger } from '../../logger'
 import type { EitherAsync } from 'purify-ts'
 import { Failure } from '../Failure'
+import { getFileMetadata } from '../../utils/getFileMetadataData'
+import { getAudioDuration } from '../video/getAudioDuration'
+import { getPercentageComplete } from '../video/getPercentageComplete'
 
 type NormaliseAudioProps = {
 	inputPath: string
 	outputPath: string
 	settings: NormalisationSettings
+	onProgress?: (percentageComplete: number) => void
 }
 
-type ExecuteProps = NormaliseAudioProps & { metadata: LoudnormMetadata }
+type ExecuteProps = NormaliseAudioProps & {
+	loudnormMetadata: LoudnormMetadata
+	audioDuration: number
+}
 
 const execute = ({
 	inputPath,
 	outputPath,
 	settings,
-	metadata,
+	loudnormMetadata,
+	audioDuration,
+	onProgress,
 }: ExecuteProps): EitherAsync<Failure, void> => {
 	return toEitherAsync((resolve, reject) =>
 		ffmpeg(inputPath)
@@ -30,11 +39,11 @@ const execute = ({
 					options: [
 						...getInputOptions(settings),
 						'print_format=json',
-						`measured_I=${metadata.inputIntegrated}`,
-						`measured_LRA=${metadata.inputLoudnessRange}`,
-						`measured_TP=${metadata.inputTruePeak}`,
-						`measured_thresh=${metadata.inputThreshold}`,
-						`offset=${metadata.targetOffset}`,
+						`measured_I=${loudnormMetadata.inputIntegrated}`,
+						`measured_LRA=${loudnormMetadata.inputLoudnessRange}`,
+						`measured_TP=${loudnormMetadata.inputTruePeak}`,
+						`measured_thresh=${loudnormMetadata.inputThreshold}`,
+						`offset=${loudnormMetadata.targetOffset}`,
 						'linear=true',
 					],
 				},
@@ -46,6 +55,14 @@ const execute = ({
 					.info(`Started normalising audio with command ${command}`),
 			)
 			.on('end', () => resolve())
+			.on('progress', ({ timemark }) => {
+				getPercentageComplete(timemark, audioDuration).ifJust(
+					percentageComplete => {
+						logger.info(`Percentage complete: ${percentageComplete}`)
+						onProgress?.(percentageComplete)
+					},
+				)
+			})
 			.on('error', (e: Error) => {
 				logger.error(e.message)
 
@@ -59,7 +76,15 @@ export const normaliseAudio = (
 	props: NormaliseAudioProps,
 ): EitherAsync<Failure, void> => {
 	const { inputPath, settings } = props
-	return getMetadata(inputPath, settings).chain(metadata =>
-		execute({ ...props, metadata }),
-	)
+	return getFileMetadata(inputPath)
+		.chain(async fileMetadata => getAudioDuration(fileMetadata))
+		.chain(audioDuration =>
+			getLoudnormMetadata(inputPath, settings).map(loudnormMetadata => ({
+				loudnormMetadata,
+				audioDuration,
+			})),
+		)
+		.chain(({ loudnormMetadata, audioDuration }) =>
+			execute({ ...props, loudnormMetadata, audioDuration }),
+		)
 }

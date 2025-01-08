@@ -59,7 +59,10 @@ export class S3Repository implements AssetRepository {
 		)
 	}
 
-	upload(asset: TempFile): EitherAsync<Failure, void> {
+	upload(
+		asset: TempFile,
+		onProgress: (percentageComplete: number) => void,
+	): EitherAsync<Failure, void> {
 		return toEitherAsync(async (resolve, reject) => {
 			try {
 				const uploadToS3 = new Upload({

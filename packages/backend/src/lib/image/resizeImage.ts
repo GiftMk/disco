@@ -15,6 +15,7 @@ type ResizeImageProps = Readonly<{
 	inputPath: string
 	aspectRatio: AspectRatio
 	outputPath: string
+	onProgress?: (percentageComplete: number) => void
 }>
 
 type ExecuteProps = ResizeImageProps & { dimensions: Dimensions }
@@ -24,6 +25,7 @@ const execute = ({
 	outputPath,
 	aspectRatio,
 	dimensions,
+	onProgress,
 }: ExecuteProps): EitherAsync<Failure, void> => {
 	return toEitherAsync((resolve, reject) =>
 		ffmpeg()
@@ -31,6 +33,9 @@ const execute = ({
 			.videoFilters([crop(dimensions), scale({ ...aspectRatio })])
 			.on('start', command =>
 				logger.info(`Started resizing image with command ${command}`),
+			)
+			.on('progress', progress =>
+				logger.info('Image resize progress', JSON.stringify(progress)),
 			)
 			.on('end', () => {
 				logger.info('Finished resizing image')
