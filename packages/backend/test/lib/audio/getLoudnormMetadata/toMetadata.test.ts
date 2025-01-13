@@ -68,7 +68,7 @@ describe('toMetadata', () => {
 		})
 
 		it('sets the normalisation type to an empty string when undefined', () => {
-			const json = { ...testLoudnormJson() }
+			const json = testLoudnormJson()
 			// biome-ignore lint/performance/noDelete: valid use-case of delete, object serves as a map
 			delete json.normalization_type
 

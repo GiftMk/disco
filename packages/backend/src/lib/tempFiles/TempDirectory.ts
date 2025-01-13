@@ -28,7 +28,7 @@ export class TempDirectory implements Disposable {
 		await this.mutex.acquire()
 	}
 
-	async unlock() {
+	unlock() {
 		this.mutex.release()
 	}
 
