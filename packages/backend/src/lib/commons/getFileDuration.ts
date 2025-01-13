@@ -1,8 +1,8 @@
-import type { FileMetadata } from '../../utils/getFileMetadataData'
+import type { FileMetadata } from './getFileMetadataData'
 import { Left, Right, type Either } from 'purify-ts'
 import { Failure } from '../Failure'
 
-export const getAudioDuration = (
+export const getFileDuration = (
 	metadata: FileMetadata,
 ): Either<Failure, number> => {
 	const duration = metadata.format.duration

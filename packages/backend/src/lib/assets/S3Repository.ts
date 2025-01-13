@@ -1,20 +1,21 @@
 import { type Either, Left, Right } from 'purify-ts/Either'
 import { EitherAsync } from 'purify-ts/EitherAsync'
-import { Failure } from '../../Failure'
-import type { AssetRepository } from './AssetRepository'
+import { Failure } from '../Failure'
+import type { AssetRepository, OnUploadProgress } from './AssetRepository'
 import {
 	GetObjectCommand,
 	PutObjectCommand,
 	type GetObjectCommandOutput,
 	type S3Client,
 } from '@aws-sdk/client-s3'
-import { toEitherAsync } from '../../../utils/eitherAsync'
+import { toEitherAsync } from '../../utils/eitherAsync'
 import { Upload } from '@aws-sdk/lib-storage'
 import fs from 'node:fs'
-import { logger } from '../../../logger'
+import { logger } from '../../logger'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import type { TempFile } from '../../tempFiles/TempFile'
+import type { TempFile } from '../tempFiles/TempFile'
 import { Readable } from 'node:stream'
+import { getPercentageComplete } from '../../utils/getPercentageComplete'
 
 const URL_TIMEOUT_S = 60 * 15
 
@@ -61,7 +62,7 @@ export class S3Repository implements AssetRepository {
 
 	upload(
 		asset: TempFile,
-		onProgress: (percentageComplete: number) => void,
+		onProgress?: OnUploadProgress,
 	): EitherAsync<Failure, void> {
 		return toEitherAsync(async (resolve, reject) => {
 			try {
@@ -74,11 +75,18 @@ export class S3Repository implements AssetRepository {
 					},
 				})
 
-				uploadToS3.on('httpUploadProgress', ({ loaded, total }) =>
+				uploadToS3.on('httpUploadProgress', ({ loaded, total }) => {
+					const percentageComplete =
+						loaded !== undefined && total !== undefined
+							? getPercentageComplete(loaded, total)
+							: 0
+
 					logger.info(
-						`Uploading ${asset.name} to S3 bucket ${this.outputBucket}, uploaded ${loaded}/${total} bytes`,
-					),
-				)
+						`Uploading ${asset.name} to S3 bucket ${this.outputBucket}, percentage complete: ${percentageComplete}`,
+					)
+
+					onProgress?.(percentageComplete)
+				})
 
 				await uploadToS3.done()
 

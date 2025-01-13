@@ -5,9 +5,9 @@ export const toEitherAsync = <TError, TValue>(
 	callback: (
 		right: (value: TValue) => void,
 		left: (error: TError) => void,
-	) => unknown,
+	) => Promise<unknown> | unknown,
 ): EitherAsync<TError, TValue> => {
-	const promise = new Promise<Either<TError, TValue>>(resolve => {
+	const promise = new Promise<Either<TError, TValue>>((resolve, reject) => {
 		const resolveRight = (value: TValue) => {
 			resolve(Right(value))
 		}
@@ -15,7 +15,11 @@ export const toEitherAsync = <TError, TValue>(
 			resolve(Left(error))
 		}
 
-		callback(resolveRight, rejectLeft)
+		const returnValue = callback(resolveRight, rejectLeft)
+
+		if (returnValue instanceof Promise) {
+			returnValue.catch(reject)
+		}
 	})
 
 	return EitherAsync.fromPromise(() => promise)

@@ -1,7 +1,7 @@
 import ffmpeg from 'fluent-ffmpeg'
-import { toEitherAsync } from './eitherAsync'
+import { toEitherAsync } from '../../utils/eitherAsync'
 import type { EitherAsync } from 'purify-ts'
-import { Failure } from '../lib/Failure'
+import { Failure } from '../Failure'
 
 export type FileMetadata = ffmpeg.FfprobeData
 

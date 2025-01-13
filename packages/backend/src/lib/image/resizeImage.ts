@@ -5,7 +5,7 @@ import { getDimensions } from './dimensions/getDimensions'
 import { crop } from './filters/crop'
 import { scale } from './filters/scale'
 import { logger } from '../../logger'
-import { getFileMetadata } from '../../utils/getFileMetadataData'
+import { getFileMetadata } from '../commons/getFileMetadataData'
 import type { Dimensions } from './dimensions/Dimensions'
 import { toEitherAsync } from '../../utils/eitherAsync'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
@@ -34,9 +34,12 @@ const execute = ({
 			.on('start', command =>
 				logger.info(`Started resizing image with command ${command}`),
 			)
-			.on('progress', progress =>
-				logger.info('Image resize progress', JSON.stringify(progress)),
-			)
+			.on('progress', ({ percent }) => {
+				const percentageComplete = percent ?? 0
+
+				logger.info(`Percentage complete: ${percentageComplete}`)
+				onProgress?.(percentageComplete)
+			})
 			.on('end', () => {
 				logger.info('Finished resizing image')
 				resolve()

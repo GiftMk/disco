@@ -42,6 +42,7 @@ export type CreatingVideoResponse = CreatingVideoPayload | Error;
 export enum CreatingVideoStep {
   CreatingVideo = 'CREATING_VIDEO',
   DownloadingAssets = 'DOWNLOADING_ASSETS',
+  Finished = 'FINISHED',
   ProcessingAssets = 'PROCESSING_ASSETS',
   UploadingVideo = 'UPLOADING_VIDEO'
 }
@@ -54,30 +55,12 @@ export type Error = {
 export type Mutation = {
   __typename?: 'Mutation';
   createVideo: CreateVideoResponse;
-  normaliseAudio: NormaliseAudioResponse;
 };
 
 
 export type MutationCreateVideoArgs = {
   input: CreateVideoInput;
 };
-
-
-export type MutationNormaliseAudioArgs = {
-  input: NormaliseAudioInput;
-};
-
-export type NormaliseAudioInput = {
-  audioFilename: Scalars['String']['input'];
-  settings?: InputMaybe<NormaliseAudioSettings>;
-};
-
-export type NormaliseAudioPayload = {
-  __typename?: 'NormaliseAudioPayload';
-  outputFilename: Scalars['String']['output'];
-};
-
-export type NormaliseAudioResponse = Error | NormaliseAudioPayload;
 
 export type NormaliseAudioSettings = {
   integrated: Scalars['Float']['input'];
@@ -193,7 +176,6 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = ResolversObject<{
   CreateVideoResponse: ( CreateVideoPayload ) | ( Error );
   CreatingVideoResponse: ( CreatingVideoPayload ) | ( Error );
-  NormaliseAudioResponse: ( Error ) | ( NormaliseAudioPayload );
   UploadDetailsResponse: ( Error ) | ( UploadDetailsPayload );
 }>;
 
@@ -211,9 +193,6 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
-  NormaliseAudioInput: NormaliseAudioInput;
-  NormaliseAudioPayload: ResolverTypeWrapper<NormaliseAudioPayload>;
-  NormaliseAudioResponse: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['NormaliseAudioResponse']>;
   NormaliseAudioSettings: NormaliseAudioSettings;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -235,9 +214,6 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   Mutation: {};
-  NormaliseAudioInput: NormaliseAudioInput;
-  NormaliseAudioPayload: NormaliseAudioPayload;
-  NormaliseAudioResponse: ResolversUnionTypes<ResolversParentTypes>['NormaliseAudioResponse'];
   NormaliseAudioSettings: NormaliseAudioSettings;
   Query: {};
   String: Scalars['String']['output'];
@@ -274,16 +250,6 @@ export type ErrorResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createVideo?: Resolver<ResolversTypes['CreateVideoResponse'], ParentType, ContextType, RequireFields<MutationCreateVideoArgs, 'input'>>;
-  normaliseAudio?: Resolver<ResolversTypes['NormaliseAudioResponse'], ParentType, ContextType, RequireFields<MutationNormaliseAudioArgs, 'input'>>;
-}>;
-
-export type NormaliseAudioPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['NormaliseAudioPayload'] = ResolversParentTypes['NormaliseAudioPayload']> = ResolversObject<{
-  outputFilename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type NormaliseAudioResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['NormaliseAudioResponse'] = ResolversParentTypes['NormaliseAudioResponse']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'Error' | 'NormaliseAudioPayload', ParentType, ContextType>;
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -314,8 +280,6 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   CreatingVideoResponse?: CreatingVideoResponseResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
-  NormaliseAudioPayload?: NormaliseAudioPayloadResolvers<ContextType>;
-  NormaliseAudioResponse?: NormaliseAudioResponseResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   UploadDetailsPayload?: UploadDetailsPayloadResolvers<ContextType>;

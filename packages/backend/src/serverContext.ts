@@ -2,14 +2,14 @@ import { S3Client } from '@aws-sdk/client-s3'
 import { env } from './environment'
 import type { CreatingVideoResponse } from './generated/graphql'
 import { createPubSub, type PubSub } from 'graphql-yoga'
-import type { AssetRepository } from './lib/audio/assets/AssetRepository'
-import { S3Repository } from './lib/audio/assets/S3Repository'
-import { FileSystemRepository } from './lib/audio/assets/FileSystemRepository'
+import type { AssetRepository } from './lib/assets/AssetRepository'
+import { S3Repository } from './lib/assets/S3Repository'
+import { FileSystemRepository } from './lib/assets/FileSystemRepository'
 import path from 'node:path'
 import os from 'node:os'
 import { TempDirectoryRepository } from './lib/tempFiles/TempDirectoryRepository'
 
-type PubSubProps = {
+export type PubSubProps = {
 	creatingVideo: [trackingId: string, payload: CreatingVideoResponse]
 }
 

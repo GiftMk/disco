@@ -27,17 +27,6 @@ input NormaliseAudioSettings {
 	loudnessRange: Float!
 }
 
-input NormaliseAudioInput {
-	audioFilename: String!
-	settings: NormaliseAudioSettings
-}
-
-type NormaliseAudioPayload {
-	outputFilename: String!
-}
-
-union NormaliseAudioResponse = NormaliseAudioPayload | Error
-
 input CreateVideoInput {
 	audioFilename: String!
 	imageFilename: String!
@@ -52,7 +41,6 @@ type CreateVideoPayload {
 union CreateVideoResponse = CreateVideoPayload | Error
 
 type Mutation {
-	normaliseAudio(input: NormaliseAudioInput!): NormaliseAudioResponse!
 	createVideo(input: CreateVideoInput!): CreateVideoResponse!
 }
 
@@ -60,7 +48,8 @@ enum CreatingVideoStep {
 	DOWNLOADING_ASSETS,
 	PROCESSING_ASSETS,
 	CREATING_VIDEO,
-	UPLOADING_VIDEO
+	UPLOADING_VIDEO,
+	FINISHED
 }
 
 type CreatingVideoPayload {

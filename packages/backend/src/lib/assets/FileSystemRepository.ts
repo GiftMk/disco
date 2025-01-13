@@ -1,11 +1,11 @@
 import type { EitherAsync } from 'purify-ts'
-import { Failure } from '../../Failure'
-import type { AssetRepository } from './AssetRepository'
+import { Failure } from '../Failure'
+import type { AssetRepository, OnUploadProgress } from './AssetRepository'
 import fs from 'node:fs'
 import path from 'node:path'
-import { LeftAsync, RightAsync } from '../../../utils/eitherAsync'
-import { logger } from '../../../logger'
-import type { TempFile } from '../../tempFiles/TempFile'
+import { LeftAsync, RightAsync } from '../../utils/eitherAsync'
+import { logger } from '../../logger'
+import type { TempFile } from '../tempFiles/TempFile'
 
 export class FileSystemRepository implements AssetRepository {
 	private readonly inputDirectory: string
@@ -42,7 +42,10 @@ export class FileSystemRepository implements AssetRepository {
 		}
 	}
 
-	upload(asset: TempFile): EitherAsync<Failure, void> {
+	upload(
+		asset: TempFile,
+		onProgress: OnUploadProgress,
+	): EitherAsync<Failure, void> {
 		if (!asset.exists()) {
 			return LeftAsync(new Failure(`Asset at ${asset.path} does not exist`))
 		}
@@ -51,7 +54,10 @@ export class FileSystemRepository implements AssetRepository {
 		try {
 			logger.info(`Uploading file at ${asset.path} to ${outputPath}`)
 
+			onProgress?.(0)
 			fs.copyFileSync(asset.path, outputPath)
+			onProgress?.(100)
+
 			return RightAsync(undefined)
 		} catch (e) {
 			logger.error(e instanceof Error ? e.message : String(e))

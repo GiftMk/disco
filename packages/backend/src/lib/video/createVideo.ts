@@ -1,11 +1,12 @@
-import { getAudioDuration } from './getAudioDuration'
-import { getFileMetadata } from '../../utils/getFileMetadataData'
+import { getFileDuration } from '../commons/getFileDuration'
+import { getFileMetadata } from '../commons/getFileMetadataData'
 import { logger } from '../../logger'
-import { getPercentageComplete } from './getPercentageComplete'
+import { getPercentageComplete } from '../../utils/getPercentageComplete'
 import { toEitherAsync } from '../../utils/eitherAsync'
 import ffmpeg from 'fluent-ffmpeg'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
 import { Failure } from '../Failure'
+import { getSecondsFromTimestamp } from '../commons/getSecondsFromTimestamp'
 
 type CreateVideoProps = {
 	audioPath: string
@@ -23,6 +24,15 @@ const execute = ({
 	audioDuration,
 	onProgress,
 }: ExecuteProps): EitherAsync<Failure, void> => {
+	const handleProgress = ({ timemark }: { timemark: string }) => {
+		getSecondsFromTimestamp(timemark)
+			.map(seconds => getPercentageComplete(seconds, audioDuration))
+			.ifJust(percentageComplete => {
+				logger.info(`Percentage complete: ${percentageComplete}`)
+				onProgress?.(percentageComplete)
+			})
+	}
+
 	return toEitherAsync((resolve, reject) => {
 		try {
 			ffmpeg()
@@ -42,14 +52,7 @@ const execute = ({
 					logger.info(`Finished making video ${outputPath}`)
 					resolve()
 				})
-				.on('progress', ({ timemark }) => {
-					getPercentageComplete(timemark, audioDuration).ifJust(
-						percentageComplete => {
-							logger.info(`Percentage complete: ${percentageComplete}`)
-							onProgress(percentageComplete)
-						},
-					)
-				})
+				.on('progress', handleProgress)
 				.on('error', () =>
 					reject(
 						new Failure(
@@ -72,6 +75,6 @@ export const createVideo = (
 	props: CreateVideoProps,
 ): EitherAsync<Failure, void> => {
 	return getFileMetadata(props.audioPath)
-		.chain(async metadata => getAudioDuration(metadata))
+		.chain(async metadata => getFileDuration(metadata))
 		.chain(audioDuration => execute({ ...props, audioDuration }))
 }

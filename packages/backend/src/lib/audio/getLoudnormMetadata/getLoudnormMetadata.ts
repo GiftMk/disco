@@ -2,7 +2,7 @@ import type { LoudnormMetadata } from './LoudnormMetadata'
 import { toMetadata } from './toMetadata'
 import type { NormalisationSettings } from '../NormalisationSettings'
 import { extractLines } from './extractLines'
-import { linesToObject } from './toObject'
+import { linesToObject } from './linesToObject'
 import type { EitherAsync } from 'purify-ts/EitherAsync'
 import type { Failure } from '../../Failure'
 
