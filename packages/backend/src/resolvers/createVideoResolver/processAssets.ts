@@ -33,22 +33,13 @@ export const processAssets = ({
 	normalisation,
 }: DownloadAssetsProps) => {
 	const resizedImageFile = tempDirectory.newFile(imageFile.extension)
-	const normalisedAudioFile = tempDirectory.newFile(audioFile.extension)
+	const normalisedAudioFile = tempDirectory.newFile('mp3')
 
-	const progress = { resizeImage: 0, normaliseAudio: 0 }
-	const handleProgress = (
-		action: 'resizeImage' | 'normaliseAudio',
-		percentageComplete: number,
-	) => {
-		progress[action] = percentageComplete
-
+	const handleProgress = (percentageComplete: number) => {
 		pubSub.publish('creatingVideo', trackingId, {
 			__typename: 'CreatingVideoPayload',
 			currentStep: CreatingVideoStep.ProcessingAssets,
-			percentageComplete: Math.min(
-				progress.resizeImage,
-				progress.normaliseAudio,
-			),
+			percentageComplete,
 		})
 	}
 
@@ -58,8 +49,6 @@ export const processAssets = ({
 				inputPath: imageFile.path,
 				outputPath: resizedImageFile.path,
 				aspectRatio: SixteenByNine,
-				onProgress: percentageComplete =>
-					handleProgress('resizeImage', percentageComplete),
 			}),
 		},
 		{
@@ -67,8 +56,7 @@ export const processAssets = ({
 				inputPath: audioFile.path,
 				outputPath: normalisedAudioFile.path,
 				settings: normalisation.settings ?? defaultSettings,
-				onProgress: percentageComplete =>
-					handleProgress('normaliseAudio', percentageComplete),
+				onProgress: handleProgress,
 			}),
 			predicate: () => normalisation.isEnabled,
 		},

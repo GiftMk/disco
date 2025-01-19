@@ -1,5 +1,5 @@
 import type { Dimensions } from './Dimensions'
-import type { FileMetadata } from '../../commons/getFileMetadataData'
+import type { FileMetadata } from '../../commons/getFileMetadata'
 import { Left, Right, type Either } from 'purify-ts/Either'
 import { Failure } from '../../Failure'
 

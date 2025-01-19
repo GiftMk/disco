@@ -1,4 +1,4 @@
-import type { FileMetadata } from './getFileMetadataData'
+import type { FileMetadata } from './getFileMetadata'
 import { Left, Right, type Either } from 'purify-ts'
 import { Failure } from '../Failure'
 

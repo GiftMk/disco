@@ -1,5 +1,5 @@
 import { getFileDuration } from '../commons/getFileDuration'
-import { getFileMetadata } from '../commons/getFileMetadataData'
+import { getFileMetadata } from '../commons/getFileMetadata'
 import { logger } from '../../logger'
 import { getPercentageComplete } from '../../utils/getPercentageComplete'
 import { toEitherAsync } from '../../utils/eitherAsync'

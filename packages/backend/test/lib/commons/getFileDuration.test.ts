@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getFileDuration } from '../../../src/lib/commons/getFileDuration'
-import type { FileMetadata } from '../../../src/lib/commons/getFileMetadataData'
+import type { FileMetadata } from '../../../src/lib/commons/getFileMetadata'
 
 describe('getFileDuration', () => {
 	it('returns the file duration if present', () => {
