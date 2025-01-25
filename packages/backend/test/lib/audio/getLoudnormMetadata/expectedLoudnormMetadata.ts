@@ -1,0 +1,62 @@
+export const expectedLoudnormMetadata = [
+	{
+		filename: 'audio-1.mp3',
+		settings: {
+			integrated: -16,
+			truePeak: -1.5,
+			loudnessRange: 11,
+		},
+		metadata: {
+			inputIntegrated: -16.29,
+			inputTruePeak: -1.48,
+			inputLoudnessRange: 3.5,
+			inputThreshold: -26.52,
+			outputIntegrated: -15.86,
+			outputTruePeak: -1.5,
+			outputLoudnessRange: 2.8,
+			outputThreshold: -25.99,
+			normalisationType: 'dynamic',
+			targetOffset: -0.14,
+		},
+	},
+	{
+		filename: 'audio-2.wav',
+		settings: {
+			integrated: -8,
+			truePeak: -4,
+			loudnessRange: 5,
+		},
+		metadata: {
+			inputIntegrated: -16.26,
+			inputTruePeak: -0.71,
+			inputLoudnessRange: 12.5,
+			inputThreshold: -26.61,
+			outputIntegrated: -15.34,
+			outputTruePeak: -4,
+			outputLoudnessRange: 4.1,
+			outputThreshold: -25.34,
+			normalisationType: 'dynamic',
+			targetOffset: 7.34,
+		},
+	},
+	{
+		filename: 'audio-3.mp3',
+		settings: {
+			integrated: -5,
+			truePeak: -5,
+			loudnessRange: 5,
+		},
+		metadata: {
+			inputIntegrated: -19.61,
+			inputTruePeak: -1.11,
+			inputLoudnessRange: 6,
+			inputThreshold: -30.25,
+			outputIntegrated: -16.72,
+			outputTruePeak: -5,
+			outputLoudnessRange: 6.1,
+			outputThreshold: -27.52,
+			normalisationType: 'dynamic',
+			targetOffset: 11.72,
+		},
+	},
+]

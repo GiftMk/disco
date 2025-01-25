@@ -2,36 +2,30 @@ type Error {
 	message: String!
 }
 
-type UploadDetailsPayload {
-	audioUploadUrl: String!
-	audioFilename: String!
-	imageUploadUrl: String!
-	imageFilename: String!
+type PresignedUrlPayload {
+	url: String!
+	sessionId: ID!
 }
 
-union UploadDetailsResponse = UploadDetailsPayload | Error
-
-input UploadDetailsInput {
-	audioExtension: String!
-	imageExtension: String!
-}
+union PresignedUrlResponse = PresignedUrlPayload | Error
 
 type Query {
-	ping: String!
-	uploadDetails(input: UploadDetailsInput!): UploadDetailsResponse!
+	presignedUrl(fileExtension: String!): PresignedUrlResponse!
 }
 
-input NormaliseAudioSettings {
+input AudioSettings {
 	integrated: Float!
 	truePeak: Float!
 	loudnessRange: Float!
 }
 
-input CreateVideoInput {
-	audioFilename: String!
-	imageFilename: String!
-	enableAudioNormalisation: Boolean
-	normaliseAudioSettings: NormaliseAudioSettings
+input AudioInput {
+	filename: String!
+	settings: AudioSettings
+}
+
+input ImageInput {
+	filename: String!
 }
 
 type CreateVideoPayload {
@@ -41,21 +35,12 @@ type CreateVideoPayload {
 union CreateVideoResponse = CreateVideoPayload | Error
 
 type Mutation {
-	createVideo(input: CreateVideoInput!): CreateVideoResponse!
-}
-
-enum CreatingVideoStep {
-	DOWNLOADING_ASSETS,
-	PROCESSING_ASSETS,
-	CREATING_VIDEO,
-	UPLOADING_VIDEO,
-	FINISHED
+	createVideo(sessionId: ID!, audio: AudioInput!, image: ImageInput!): CreateVideoResponse!
 }
 
 type CreatingVideoPayload {
 	percentageComplete: Float
-	currentStep: CreatingVideoStep!
-	outputFilename: String
+	videoFilename: String
 }
 
 union CreatingVideoResponse = CreatingVideoPayload | Error

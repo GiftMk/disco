@@ -16,5 +16,6 @@
 		"declaration": true,
 		"declarationMap": true,
 		"composite": true
-	}
+	},
+	"include": ["src", "test", "test/**/*.json"]
 }
