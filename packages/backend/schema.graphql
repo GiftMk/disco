@@ -4,7 +4,7 @@ type Error {
 
 type PresignedUrlPayload {
 	url: String!
-	sessionId: ID!
+	assetId: ID!
 }
 
 union PresignedUrlResponse = PresignedUrlPayload | Error
@@ -20,12 +20,12 @@ input AudioSettings {
 }
 
 input AudioInput {
-	filename: String!
+	assetId: ID!
 	settings: AudioSettings
 }
 
 input ImageInput {
-	filename: String!
+	assetId: ID!
 }
 
 type CreateVideoPayload {
@@ -35,7 +35,7 @@ type CreateVideoPayload {
 union CreateVideoResponse = CreateVideoPayload | Error
 
 type Mutation {
-	createVideo(sessionId: ID!, audio: AudioInput!, image: ImageInput!): CreateVideoResponse!
+	createVideo(audio: AudioInput!, image: ImageInput!): CreateVideoResponse!
 }
 
 type CreatingVideoPayload {

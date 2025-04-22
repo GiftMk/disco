@@ -1,7 +1,6 @@
-import {
-	CreatingVideoStep,
-	type CreateVideoResponse,
-	type MutationCreateVideoArgs,
+import type {
+	CreateVideoResponse,
+	MutationCreateVideoArgs,
 } from '../../generated/graphql'
 import type { ServerContext } from '../../serverContext'
 import { randomUUID } from 'node:crypto'
@@ -17,15 +16,11 @@ export const createVideoResolver = async (
 	args: MutationCreateVideoArgs,
 	context: ServerContext,
 ): Promise<CreateVideoResponse> => {
-	const {
-		audioFilename,
-		imageFilename,
-		enableAudioNormalisation,
-		normaliseAudioSettings,
-	} = args.input
+	const { audio, image } = args
+
 	const { pubSub, assetRepository, tempDirectoryRepository } = context
 	using tempDirectory = tempDirectoryRepository.newDirectory()
-	const trackingId = 'giftmk'
+	const trackingId = randomUUID()
 
 	await tempDirectory.lock()
 
@@ -34,8 +29,8 @@ export const createVideoResolver = async (
 		trackingId,
 		tempDirectory,
 		assetRepository,
-		audioFilename,
-		imageFilename,
+		audioFilename: audio.assetId,
+		imageFilename: image.assetId,
 	})
 		.chain(({ audioFile, imageFile }) =>
 			processAssets({
@@ -45,8 +40,8 @@ export const createVideoResolver = async (
 				audioFile,
 				imageFile,
 				normalisation: {
-					settings: normaliseAudioSettings,
-					isEnabled: Boolean(enableAudioNormalisation),
+					settings: audio.settings,
+					isEnabled: Boolean(audio.settings),
 				},
 			}),
 		)
@@ -64,8 +59,7 @@ export const createVideoResolver = async (
 		.ifRight(({ videoFilename }) => {
 			pubSub.publish('creatingVideo', trackingId, {
 				__typename: 'CreatingVideoPayload',
-				outputFilename: videoFilename,
-				currentStep: CreatingVideoStep.Finished,
+				videoFilename,
 			})
 		})
 		.run()

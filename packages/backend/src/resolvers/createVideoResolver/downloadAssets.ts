@@ -2,7 +2,6 @@ import type { PubSub } from 'graphql-yoga'
 import type { AssetRepository } from '../../lib/assets/AssetRepository'
 import { concurrently } from '../../utils/eitherAsync'
 import type { PubSubProps } from '../../serverContext'
-import { CreatingVideoStep } from '../../generated/graphql'
 import type { TempDirectory } from '../../lib/tempFiles/TempDirectory'
 import { getExtension } from '../../utils/getExtension'
 
@@ -28,7 +27,6 @@ export const downloadAssets = ({
 
 	pubSub.publish('creatingVideo', trackingId, {
 		__typename: 'CreatingVideoPayload',
-		currentStep: CreatingVideoStep.DownloadingAssets,
 	})
 
 	return concurrently(

@@ -1,10 +1,7 @@
 import type { PubSub } from 'graphql-yoga'
 import type { TempFile } from '../../lib/tempFiles/TempFile'
 import type { PubSubProps } from '../../serverContext'
-import {
-	CreatingVideoStep,
-	type NormaliseAudioSettings,
-} from '../../generated/graphql'
+import type { AudioSettings } from '../../generated/graphql'
 import { concurrently } from '../../utils/eitherAsync'
 import { resizeImage } from '../../lib/image/resizeImage'
 import { SixteenByNine } from '../../lib/image/dimensions/AspectRatio'
@@ -19,7 +16,7 @@ type DownloadAssetsProps = {
 	audioFile: TempFile
 	imageFile: TempFile
 	normalisation: {
-		settings?: NormaliseAudioSettings | null
+		settings?: AudioSettings | null
 		isEnabled: boolean
 	}
 }
@@ -38,7 +35,6 @@ export const processAssets = ({
 	const handleProgress = (percentageComplete: number) => {
 		pubSub.publish('creatingVideo', trackingId, {
 			__typename: 'CreatingVideoPayload',
-			currentStep: CreatingVideoStep.ProcessingAssets,
 			percentageComplete,
 		})
 	}

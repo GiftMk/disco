@@ -1,5 +1,4 @@
 import type { PubSub } from 'graphql-yoga'
-import { CreatingVideoStep } from '../../generated/graphql'
 import type { TempFile } from '../../lib/tempFiles/TempFile'
 import { createVideo } from '../../lib/video/createVideo'
 import type { PubSubProps } from '../../serverContext'
@@ -24,7 +23,6 @@ export const produceVideo = ({
 
 	pubSub.publish('creatingVideo', trackingId, {
 		__typename: 'CreatingVideoPayload',
-		currentStep: CreatingVideoStep.CreatingVideo,
 		percentageComplete: 0,
 	})
 
@@ -35,7 +33,6 @@ export const produceVideo = ({
 		onProgress: percentageComplete =>
 			pubSub.publish('creatingVideo', trackingId, {
 				__typename: 'CreatingVideoPayload',
-				currentStep: CreatingVideoStep.CreatingVideo,
 				percentageComplete,
 			}),
 	}).map(() => ({ videoFile }))
